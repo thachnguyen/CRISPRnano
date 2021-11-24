@@ -182,7 +182,7 @@
         var reader;
         var CurrentFileId, CurrentFileChunk;
         var MutationThreshold = 0, PhredThreshold = 12;
-        var leftbs, rightbs;
+        var rightbs;
         var TargetingOligo = "", TargetingOligoBracketFrom = -1, TargetingOligoBracketTo = -1;
 
         //reverse comp function
@@ -286,7 +286,6 @@
 
                 var target1 = target.substr(BreakPoint-region_analyse -10,BreakPoint+region_analyse +10)
                 
-
                 //1st step to check part of sgRNA in the read? use small flunctuate in alignment score
                 var rst1 = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
 
@@ -296,6 +295,7 @@
                     str1 += 'score: ' + rst[0] + '\n';
                     str1 += 'start: ' + rst[1] + '\n';
                     str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n\n';
+                    alert(rst[2])
                     str1 += 'alignment:\n\n';
                     var linelen = 200, n_lines = 10;
                     var fmt = bsa_cigar2gaps(target, read, rst[1], rst[2]);
