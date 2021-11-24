@@ -4,9 +4,9 @@
         <title>CrispNano</title>
         </head>
         <body background="./main_files/theme.jpg" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body>
-         <h1>CRiSPRNano a lightweight CRISPR analysis program</h1>
+         <h1>CRISPRNano a lightweight CRISPR analysis program</h1>
          <br>
-         This website is free and open to all users and there is no login requirement
+         CRISPRNano website is free and open to all users and there is no login requirement
          <br>
          <div id="save" style="display:none">test</div>
 
@@ -17,7 +17,7 @@
                 <br>Barcode Files (optional): <a href="javascript:alert(&#39; Your input barcode files your CRISPR experiment data, make sure that the correct ordering of barcode. The file must be in fasta format by the numbers given below the output pie charts.&#39;)">(?)</a> <br><input type="file" id="barcode_files" name="files[]" multiple=""><br><br>
                 <br>Reference Sequence: <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" size="100" name="Locus" value="ACTGTCCCTCTTTCCCATACACTGCCCCACAACTGTTTGTGTGTACAGTTCCTTGCTTACCTCTTCAAAGGTATGTTCCACATCTTCAATCAACTGGCCGCGGCTGTAGTCATAGCCATCTACCCCATTTACTTCATAGTCTCCTCTCCAATAATCCCCA"><br>
                 <br>Nuclease Target Site: <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" size="40" name="RightBS" value="CATCTTCAATCAACTGGCCG"><br>
-                <br>Analysing region (optional) +/-: <a href="javascript:alert(&#39;it is recommended to use only the +/-5 bases surrounding the desired breaking point.&#39;)">(?)</a><br><input type="text" size="20" name="TargetingOligo" value="5"><br>
+                <br>Analysing region (optional) +/-: <a href="javascript:alert(&#39;it is recommended to use only the +/-5 bases surrounding the desired breaking point.&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="5"><br>
                 <br>Indel Threshold [%]: <a href="javascript:alert(&#39;The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered (default is 5 %).&#39;)">(?)</a><br><input type="text" size="20" name="MutationThreshold" value="5"><br>
                 <br>Phred Score Threshold: <a href="javascript:alert(&#39;A Phred Score Threshold is used to specifically consider the read quality of the two bases surrounding the indel position (one base preceding, one base following the indel position). We recommend a default Phred Score Threshold of 12, yet depending on the sequencing quality adjustments should be considered.&#39;)">(?)</a><br><input type="text" size="20" name="PhredThreshold" value="12"><br>
                 <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" size="100" name="GeneName" value="ACE2"><br>
@@ -83,7 +83,6 @@
                     <br><button onclick="SaveTable();">Save mutation statistics (.txt)</button>
                 </div>
             </div>
-
 
             <div id="results_temp" style="position: absolute; left: 20px; top: 160px; display: none;">
                 <textarea id="out" rows="100000" readonly="" style="border: 0" cols="210" wrap="on"></textarea>              
@@ -210,6 +209,8 @@
             MutationThreshold = document.getElementsByName("MutationThreshold")[0].value;
             PhredThreshold = document.getElementsByName("PhredThreshold")[0].value*1 + 33;  //Phred quality score
 
+            region_analyse = document.getElementsByName("region_analyse")[0].value;
+
             //Find Target site in the wild type sequence:
             if (RightBsLen == 0)
             {
@@ -249,7 +250,6 @@
         {
             var original = RestFromLastChunk+reader.result;
             var cursor = 0, origlen = original.length;
-
             // alignment parameter for affine score DP algorithms 
             var ms = 1 // match score
             var mms = -2 //mismatch score
@@ -283,6 +283,9 @@
                 var readlen = read.length;
 
                 var target = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
+
+                var target1 = target.substr(BreakPoint-region_analyse -10,BreakPoint+region_analyse +10)
+                
 
                 //1st step to check part of sgRNA in the read?
                 var rst1 = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
@@ -332,7 +335,7 @@
             }
             else
             {
-                DrawKuchen();
+                DrawPie();
             }
         }
 
@@ -355,7 +358,7 @@
             document.getElementById('progress').innerHTML = "File "+(CurrentFileId+1)+": "+Math.round(CurrentFileChunk*chunksize/1000000)+" MB processed.";
         }
 
-        function DrawKuchen()
+        function DrawPie()
         {
             var svg = document.getElementById("SVGpie");
             var NS="http://www.w3.org/2000/svg";
@@ -379,11 +382,6 @@
                 sum += ShiftUnresolved[barcode];
                 if (sum > maxsum) maxsum = sum;
             }
-            // if (maxsum == 0)
-            // {
-            //     alert("No reads mapping to the reference sequence were found.");
-            //     return;
-            // }
 
             for (var barcode=0; barcode<192; barcode++)
             {
