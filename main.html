@@ -295,10 +295,9 @@
                     str1 += 'score: ' + rst[0] + '\n';
                     str1 += 'start: ' + rst[1] + '\n';
                     str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n\n';
-                    alert(rst[2])
                     str1 += 'alignment:\n\n';
                     var linelen = 200, n_lines = 10;
-                    var fmt = bsa_cigar2gaps(target, read, rst[1], rst[2]);
+                    var fmt = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-10, BreakPoint +10);
                     for (var l = 0; l < fmt[0].length; l += linelen) {
                         str1 += fmt[0].substr(l, linelen) + '\n';
                         str1 += fmt[2].substr(l, linelen) + '\n';
@@ -321,8 +320,6 @@
             CurrentFileChunk++;
             if ((CurrentFileChunk)*chunksize >= files[CurrentFileId].size) //end of file -> next file
             {
-                CalcAlignment(hits[id], id, locus);
-
                 CurrentFileChunk = 0;
                 RestFromLastChunk = "";
                 CurrentFileId++;
@@ -334,15 +331,6 @@
             else
             {
                 DrawPie();
-            }
-        }
-
-        function RegisterLogo(read, pos, shift)
-        {
-            for (var seqpos=0; seqpos<250; seqpos++) for (var base=0; base<4; base++) if (read[seqpos] == GATC[base])
-            {
-                var LogoIndex = pos*150*250*4 + shift*250*4 + seqpos*4 + base;
-                HitLogo[LogoIndex]++;
             }
         }
 
@@ -468,14 +456,12 @@
                     SVGObj.style.fill=ROT[MutationNr%3];
                     SVGObj.setAttribute("pointer-events","none");
                     svg.appendChild(SVGObj);
-
                     MutationNr++;
                 }
                 if (RestNoFrameshift>0)
                 {
                     lastwinkel = winkel;
                     winkel+=2*3.1415*0.995*RestNoFrameshift/sum2;
-
                     //SVG:
                     var startx = size*Math.cos(lastwinkel);
                     var starty = size*Math.sin(lastwinkel);
@@ -488,7 +474,6 @@
                     SVGObj.style.fill=BLAU[MutationNr%3];
                     SVGObj.setAttribute("pointer-events","none");
                     svg.appendChild(SVGObj);
-
                     MutationNr++;
                 }
 
@@ -628,213 +613,6 @@
         {
             var ABC = "ABCDEFGH";
             return ABC[Math.floor(i/12)] + ((i%12)+1);
-        }
-
-        //Alignment plot:
-        function CalcAlignment(hits, barcode, locus)
-        {
-            var yproj = 2;
-            var ysize = 30;
-            var maxdel = 70;
-            var xfrom = RightBsPos-20, xto = xfrom+80;
-            if (xto >= locus.length)
-            {
-                xfrom = locus.length-80;
-                xto = locus.length;
-            }
-            if (xto >= 250)
-            {
-                xfrom = 250-80;
-                xto = 250;
-            }
-            var xsize = xto-xfrom;
-
-            //Find Max:
-            var max=0;
-            for (var x=xfrom; x<xto; x++)
-            for (var y=0; y<maxdel; y++)
-			if (hits[x][y] > max)
-            max = hits[x][y];
-            var maxfactor = 1;
-            if (max>0) maxfactor = 130/max;
-
-            var sum = 0; for (var i=0; i<250; i++) for (var ii=0; ii<150; ii++) sum += hits[i][ii];
-            sum += ShiftUnresolved[barcode];
-
-            var svg = document.getElementById("SVGmut");
-            var NS="http://www.w3.org/2000/svg";
-            var strokew = "0.5";
-
-            //Clear:
-            while (svg.lastChild)
-            {
-                svg.removeChild(svg.lastChild);
-            }
-
-            var delypos=20, delyshift=40;
-
-            //bc, readsum:
-            var SVGObj= document.createElementNS(NS,"text");
-            SVGObj.setAttribute("x", 10);
-            SVGObj.setAttribute("y", ysize+delypos);
-            SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent = "Gene: "+document.getElementsByName("GeneName")[0].value+"   |   File "+GetWellPos(barcode)+": "+files[barcode].name+"   |   Amplicon reads: "+sum;
-            svg.appendChild(SVGObj);
-            delypos+=delyshift;
-
-            //wt:
-            for (var x=xfrom; x<xto; x++)
-            {
-                //draw base:
-                var SVGObj= document.createElementNS(NS,"text");
-                SVGObj.setAttribute("x", 120+12*(x-xfrom)+2);
-                SVGObj.setAttribute("y", ysize+delypos);
-                SVGObj.setAttribute("font-size", "14");
-                if (x>=RightBsPos && x<RightBsPos+RightBsLen) SVGObj.setAttribute("fill", "rgb(0,0,200)");
-                else SVGObj.setAttribute("fill", "rgb(0,0,0)");
-                SVGObj.textContent = locus[x];
-                SVGObj.setAttribute("x", 120+12*(x-xfrom));
-                SVGObj.setAttribute("text-anchor", "middle");
-                svg.appendChild(SVGObj);
-            }
-            //reference:
-            var SVGObj= document.createElementNS(NS,"text");
-            SVGObj.setAttribute("x", 10);
-            SVGObj.setAttribute("y", ysize+delypos);
-            SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent += "REFERENCE";
-            svg.appendChild(SVGObj);
-            //line:
-            var SVGObj= document.createElementNS(NS,"path");
-            SVGObj.setAttributeNS(null, "d", "M 10,"+(ysize+delypos+5.5)+" L 1073,"+(ysize+delypos+5.5));
-            SVGObj.style.stroke="rgb(0,0,0)";
-            SVGObj.setAttributeNS(null, "stroke-width", 1);
-            svg.appendChild(SVGObj);
-            delypos+=delyshift;
-
-            //Del seq:
-            var indelnr=0;
-            var callsum=0;
-            for (var i=0; i<250; i++) for (var ii=0; ii<150; ii++)
-            {
-                var hitnum = hits[i][ii];
-                if (i==249 && ii==10) //failed alignment
-                {
-                    hitnum = ShiftUnresolved[barcode];
-                }
-                if (hitnum*100/sum > MutationThreshold || (i==249 && ii==10))
-                {
-                    var wtx=0;
-                    var stackingpos;
-                    for (var x=xfrom; wtx<xto-1 && x<250; x++) for (var base=0; base<4; base++)
-                    {
-                        wtx = x;
-                        if (x >= i && ii!=149) wtx += ii-10;
-
-                        //get base strength:
-                        var LogoIndex = i*150*250*4 + ii*250*4 + x*4 + base;
-                        var basehits = HitLogo[LogoIndex], totalbasehits = hitnum;
-
-                        //calculate base fraction:
-                        var basefraction = basehits/totalbasehits;
-                        if (base==0) stackingpos = 0;
-                        if (basefraction > 0.2)
-                        {
-                            //draw base:
-                            var SVGObj= document.createElementNS(NS,"text");
-                            SVGObj.setAttribute("x", 120+12*(wtx-xfrom));
-                            SVGObj.setAttribute("y", ysize+delypos-stackingpos);
-                            //color:
-                            if (GATC[base] != locus[wtx]) SVGObj.setAttribute("fill", "rgb(232,0,30)");
-                            else SVGObj.setAttribute("fill", "rgb(0,0,0)");
-                            if (ii == 149 && x >= i+TargetingOligoBracketFrom && x < i+TargetingOligoBracketTo) SVGObj.setAttribute("fill", "rgb(0,232,30)");
-                            //inserts low:
-                            if (x >= i && x < i-(ii-10))
-                            {
-                                SVGObj.setAttribute("x", 120+12*(wtx-xfrom+(10-ii)/2));
-                                SVGObj.setAttribute("y", ysize+delypos+15*0.9-stackingpos);
-                                SVGObj.setAttribute("fill", "rgb(0,0,0)");
-                            }
-
-                            SVGObj.setAttribute("font-size", 14*basefraction);
-                            stackingpos += 14*basefraction*0.8;
-                            SVGObj.setAttribute("text-anchor", "middle");
-                            SVGObj.textContent = GATC[base];
-                            if (x == i-1 && ii<10) SVGObj.textContent += "|";
-                            svg.appendChild(SVGObj);
-
-                            //striche:
-                            if (x == i && ii > 10 && ii != 149) for (var strichnr=0; strichnr<ii-10; strichnr++)
-                            {
-                                var SVGObj= document.createElementNS(NS,"text");
-                                SVGObj.setAttribute("x", 120+12*(wtx-xfrom-1-strichnr));
-                                SVGObj.setAttribute("y", ysize+delypos);
-                                SVGObj.setAttribute("font-size", 14);
-                                SVGObj.setAttribute("text-anchor", "middle");
-                                SVGObj.textContent = "-";
-                                svg.appendChild(SVGObj);
-                            }
-                        }
-                    }
-                    //Percent:
-                    var SVGObj= document.createElementNS(NS,"text");
-                    SVGObj.setAttribute("x", 100+12*(xto+3-xfrom));
-                    SVGObj.setAttribute("y", ysize+delypos);
-                    SVGObj.setAttribute("font-size", "14");
-                    SVGObj.textContent = ""+Math.round(hitnum*100/sum)+"% ("+hitnum+" reads)";
-                    svg.appendChild(SVGObj);
-
-                    //INDEL:
-                    var SVGObj= document.createElementNS(NS,"text");
-                    SVGObj.setAttribute("x", 10);
-                    SVGObj.setAttribute("y", ysize+delypos+15*0.9);
-                    SVGObj.setAttribute("font-size", "14");
-                    if (i==0 && ii==10) SVGObj.textContent = "no indel";
-                    if (ii<10) SVGObj.textContent = " "+(10-ii)+"nt insertion";
-                    if (ii>10) SVGObj.textContent = " "+(ii-10)+"nt deletion";
-                    if (ii == 149) SVGObj.textContent = "targeted mutagenesis";
-                    if (i==249) SVGObj.textContent = "Failed alignment";
-                    svg.appendChild(SVGObj);
-
-                    //Indel nr:
-                    var SVGObj= document.createElementNS(NS,"text");
-                    SVGObj.setAttribute("x", 10);
-                    SVGObj.setAttribute("y", ysize+delypos);
-                    SVGObj.setAttribute("font-size", "14");
-                    SVGObj.textContent += "CALL #"+(indelnr+1);
-                    svg.appendChild(SVGObj);
-                    indelnr++;
-
-                    delypos+=delyshift;
-                    callsum += hitnum;
-                }
-            }
-
-            //Below calling threshold:
-            var SVGObj= document.createElementNS(NS,"text");
-            SVGObj.setAttribute("x", 10);
-            SVGObj.setAttribute("y", ysize+delypos);
-            SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent += "BELOW CALLING THRESHOLD";
-            svg.appendChild(SVGObj);
-            var SVGObj= document.createElementNS(NS,"text");
-            SVGObj.setAttribute("x", 100+12*(xto+3-xfrom));
-            SVGObj.setAttribute("y", ysize+delypos);
-            SVGObj.setAttribute("font-size", "14");
-            var rest = sum-callsum;
-            SVGObj.textContent = ""+Math.round(rest*100/sum)+"% ("+rest+" reads)";
-            svg.appendChild(SVGObj);
-            delypos+=delyshift;
-
-            //Phred Dropouts:
-            var SVGObj= document.createElementNS(NS,"text");
-            SVGObj.setAttribute("x", 10);
-            SVGObj.setAttribute("y", ysize+delypos);
-            SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent += "Phred score dropouts: "+PhredUnresolved[barcode]+" reads";
-            svg.appendChild(SVGObj);
-
-            AlignmentPrecalc[barcode] = document.getElementById("DIV_alignment").innerHTML;
         }
 
         function SaveSVG()
