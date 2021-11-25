@@ -227,6 +227,58 @@ function bsa_cigar2gaps(target, query, start, cigar)
 	return [ot, oq, mid];
 }
 
+// generate cigar to gap in breakpoint windows
+function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
+{
+	var oq = '', ot = '', mid = '', lq = 0, lt = start;
+	var bkp11 = bkp1;
+    var bkp22 = bkp2;
+    for (var k = 0; k < cigar.length; ++k) {
+        var op = cigar[k]&0xf, len = cigar[k]>>4;
+        if (lt + len <= bkp11){
+            if (op == 0) { // match
+                oq += query.substr(lq, len);
+                ot += target.substr(lt, len);
+                lq += len, lt += len;
+            } else if (op == 1) { // insertion
+                oq += query.substr(lq, len);
+                ot += Array(len+1).join("-");
+                lq += len;
+                bkp11 += len
+                bkp22 += len
+            } else if (op == 2) { // deletion
+                oq += Array(len+1).join("-");
+                ot += target.substr(lt, len);
+                lt += len;
+            } else if (op == 4) { // soft clip
+                lq += len;
+            }
+        }
+        else {
+            if (op == 0) { // match
+                oq += query.substr(lq, len);
+                ot += target.substr(lt, len);
+                lq += len, lt += len;
+            } else if (op == 1) { // insertion
+                oq += query.substr(lq, len);
+                ot += Array(len+1).join("-");
+                lq += len;
+            } else if (op == 2) { // deletion
+                oq += Array(len+1).join("-");
+                ot += target.substr(lt, len);
+                lt += len;
+            } else if (op == 4) { // soft clip
+                lq += len;
+            }
+        }    
+    }
+	var ut = ot.toUpperCase();
+	var uq = oq.toUpperCase();
+	for (var k = 0; k < ut.length; ++k)
+		mid += ut.charAt(k) == uq.charAt(k)? '|' : ' ';
+	return [ot.substr(bkp11, bkp22-bkp11), oq.substr(bkp11, bkp22-bkp11), mid.substr(bkp11, bkp22-bkp11)];
+}
+
 function bsa_cigar2str(cigar)
 {
 	var s = [];
