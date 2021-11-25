@@ -233,6 +233,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
 	var oq = '', ot = '', mid = '', lq = 0, lt = start;
 	var bkp11 = bkp1;
     var bkp22 = bkp2;
+    var aln_type = 0;
     for (var k = 0; k < cigar.length; ++k) {
         var op = cigar[k]&0xf, len = cigar[k]>>4;
         if (lt + len <= bkp11){
@@ -254,7 +255,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 lq += len;
             }
         }
-        else {
+        else if (bkp22 >= lt+len){
             if (op == 0) { // match
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
@@ -263,20 +264,78 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 oq += query.substr(lq, len);
                 ot += Array(len+1).join("-");
                 lq += len;
+                if (len%3 == 0){
+                    if (aln_type==0){
+                        aln_type = 1} // inframe insertion     
+                }
+                else{
+                    if (aln_type==0){
+                    aln_type =2 // outframe insertion
+                    }
+                }
             } else if (op == 2) { // deletion
                 oq += Array(len+1).join("-");
                 ot += target.substr(lt, len);
                 lt += len;
+                if (len%3 == 0){
+                    if (aln_type==0){
+                        aln_type = 3 // inframe deletion
+                    }     
+                }
+                else{
+                    if (aln_type==0){
+                        aln_type =4 // outframe deletion
+                    }
+                }
             } else if (op == 4) { // soft clip
                 lq += len;
             }
+        }
+        else {
+            if (op == 0) { // match
+                oq += query.substr(lq, len);
+                ot += target.substr(lt, len);
+                lq += len, lt += len;
+                //aln_type = 0 //no indel
+            } else if (op == 1) { // insertion
+                oq += query.substr(lq, len);
+                ot += Array(len+1).join("-");
+                lq += len;
+                if ((bkp22-bkp11)%3 == 0){
+                    if (aln_type==0){
+                        aln_type = 1 // inframe insertion  
+                    }   
+                }
+                else{
+                    if (aln_type==0){
+                        aln_type =2 // outframe insertion
+                    }
+                }
+            } else if (op == 2) { // deletion
+                oq += Array(len+1).join("-");
+                ot += target.substr(lt, len);
+                lt += len;
+                if ((bkp22-bkp11)%3 == 0){
+                    if (aln_type==0){
+                        aln_type = 3 // inframe deletion
+                    }     
+                }
+                else{
+                    if (aln_type==0){
+                        aln_type =4 // outframe deletion
+                    }
+                }
+            } else if (op == 4) { // soft clip
+                lq += len;
+        }
         }    
     }
 	var ut = ot.toUpperCase();
 	var uq = oq.toUpperCase();
 	for (var k = 0; k < ut.length; ++k)
 		mid += ut.charAt(k) == uq.charAt(k)? '|' : ' ';
-	return [ot.substr(bkp11, bkp22-bkp11), oq.substr(bkp11, bkp22-bkp11), mid.substr(bkp11, bkp22-bkp11)];
+	return [[ot, oq, mid], aln_type];
+    //return [[ot.substr(bkp11, bkp22-bkp11), oq.substr(bkp11, bkp22-bkp11), mid.substr(bkp11, bkp22-bkp11)], aln_type];
 }
 
 function bsa_cigar2str(cigar)
