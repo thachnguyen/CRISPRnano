@@ -3,6 +3,7 @@
     <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
         <title>CrispNano</title>
         </head>
+        <h1>CRISPRnano: a feature weight webserver for analyzing long read genome editing </h1>
         <body background="./main_files/theme.jpg" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body>
          <br>
          CRISPRNano website is free and open to all users and there is no login requirement
@@ -139,8 +140,8 @@
             if (i==0) document.getElementById("setup").style.display = "";
             else document.getElementById("setup").style.display = "none";
 
-            if (i==1) document.getElementById("results_temp").style.display = "";
-            else document.getElementById("results_temp").style.display = "none";
+            if (i==1) document.getElementById("results").style.display = "";
+            else document.getElementById("results").style.display = "none";
 
             if (i==2) document.getElementById("about").style.display = "";
             else document.getElementById("about").style.display = "none";
@@ -159,7 +160,7 @@
             hits[i] = Array(10000);
             for (var ii=0; ii<1000; ii++)
             {
-                hits[i][ii] = 0;
+                hits[i][ii] = -1;
             }
         }
 
@@ -355,34 +356,56 @@
             for (var barcode=0; barcode<192; barcode++)
             {
                 var sum = 0;
-                for (var i=0; i<250; i++) for (var ii=0; ii<150; ii++) sum += hits[barcode][i][ii];
-                sum += ShiftUnresolved[barcode];
+                for (var i=0; i<10000; i++){
+                    if (hits[barcode][i]>=0){
+                        sum++
+                    }
+                }
                 if (sum > maxsum) maxsum = sum;
             }
 
             for (var barcode=0; barcode<192; barcode++)
             {
                 var sum = 0;
-                for (var i=0; i<250; i++) for (var ii=0; ii<150; ii++) sum += hits[barcode][i][ii];
-                var sum2 = 0;
-                for (var i=0; i<250; i++) for (var ii=0; ii<150; ii++) if (hits[barcode][i][ii]*100/sum > /*MutationThreshold*/0.1 || (i==0 && ii==10)) sum2 += hits[barcode][i][ii];
+                var no_indel = 0; 
+                var inf_insert = 0;
+                var out_insert = 0;
+                var inf_del = 0;
+                var out_del = 0;
 
-                //Include also unresolved and below threshold in total pie size:
-                sum += ShiftUnresolved[barcode];
-                sum2 = sum;
-
-
-                var size = 24*Math.sqrt(sum2/maxsum);
-
+                for (var i=0; i<10000; i++){
+                    if (hits[barcode][i]>=0){
+                        sum++
+                        switch (hits[barcode][i]){
+                            case 0:
+                                no_indel++;
+                                break;
+                            case 1:
+                                inf_insert++;
+                                break;
+                            case 2:
+                                out_insert++;
+                                break;
+                            case 3:
+                                inf_del++;
+                                break;
+                            case 4: 
+                                out_del++;
+                                break;
+                        }
+                    }
+                }
+                
+                var size = 24*Math.sqrt(sum/maxsum);
                 var midx = (barcode%12)*50 + 25;
                 var midy = Math.floor(barcode/12) * 65 + 25;
 
-                if (sum2 > 0)
+                if (sum > 0)
                 {
                     //wt zeichnen:
                     var winkel = -3.1415/2;
                     var lastwinkel = winkel;
-                    winkel+=2*3.1415*0.995*hits[barcode][0][10]/sum2;
+                    winkel+=2*3.1415*0.995*no_indel/sum;
 
                     //SVG:
                     var startx = size*Math.cos(lastwinkel);
