@@ -4,7 +4,6 @@
         <title>CrispNano</title>
         </head>
         <body background="./main_files/theme.jpg" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body>
-         <h1>CRISPRNano a lightweight CRISPR analysis program</h1>
          <br>
          CRISPRNano website is free and open to all users and there is no login requirement
          <br>
@@ -157,33 +156,21 @@
         var hits = Array(192);
         for (var i=0; i<192; i++)
         {
-            hits[i] = Array(250);
-            for (var ii=0; ii<250; ii++)
+            hits[i] = Array(10000);
+            for (var ii=0; ii<1000; ii++)
             {
-                hits[i][ii] = Array(150);
-                for (var iii=0; iii<150; iii++) hits[i][ii][iii] = 0;
+                hits[i][ii] = 0;
             }
         }
 
-        var HitLogo = new Uint32Array(250*150*250*4);
         var AlignmentPrecalc = new Array(192);
-        var GATC = "GATC";
-
-        var ShiftUnresolved = Array(192);
-        var PhredUnresolved = Array(192);
-        for (var i=0; i<192; i++)
-        {
-            ShiftUnresolved[i] = 0;
-            PhredUnresolved[i] = 0;
-        }
-
+ 
         var locus, locuslen;
         var files;
         var reader;
         var CurrentFileId, CurrentFileChunk;
         var MutationThreshold = 0, PhredThreshold = 12;
         var rightbs;
-        var TargetingOligo = "", TargetingOligoBracketFrom = -1, TargetingOligoBracketTo = -1;
 
         //reverse comp function
         function ReverseComplement(A)
@@ -257,8 +244,6 @@
             var gape = -1  // gap extent score
             var is_local = true
 
-            if (CurrentFileChunk == 0) for (var i=0; i<250*150*250*4; i++) HitLogo[i] = 0;
-
             var id = CurrentFileId;
 
             var readnum = 0;
@@ -291,25 +276,30 @@
 
                 if (rst1[0]> RightBsLen/2 +1){
                     var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
-                    var str1 = 'read number:' + readnum +'\n';
+                    var str1 = 'file_id' +id+ 'read number:' + readnum +'\n';
                     str1 += 'score: ' + rst[0] + '\n';
                     str1 += 'start: ' + rst[1] + '\n';
-                    str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n\n';
-                    str1 += 'alignment:\n\n';
+                    str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
+                    str1 += 'alignment:\n';
                     var linelen = 200, n_lines = 10;
-                    var fmt = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-10, BreakPoint +10);
+                    var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-10, BreakPoint +10);
+                    //alert(fmt1)
+                    var fmt = fmt1[0]
+                    var aln_type = fmt1[1]
                     for (var l = 0; l < fmt[0].length; l += linelen) {
                         str1 += fmt[0].substr(l, linelen) + '\n';
                         str1 += fmt[2].substr(l, linelen) + '\n';
                         str1 += fmt[1].substr(l, linelen) + '\n\n';
+                        str1 += aln_type + '\n';
                         n_lines += 4;
                     }
                     str +=str1
                     document.getElementById('out').value = str
                 }
+                hits[id][readnum] = aln_type
                 readnum++;
+                
             }
-
             RestFromLastChunk = original.substr(cursor);
 
             //lines = "";
@@ -323,6 +313,7 @@
                 CurrentFileChunk = 0;
                 RestFromLastChunk = "";
                 CurrentFileId++;
+                //id++;
             }
             if (CurrentFileId < files.length && CurrentFileId<192)
             {
