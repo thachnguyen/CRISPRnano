@@ -86,7 +86,7 @@
             <div id="results_temp" style="position: absolute; left: 20px; top: 160px; display: none;">
                 <textarea id="out" rows="100000" readonly="" style="border: 0" cols="210" wrap="on"></textarea>              
             </div>
-            <div id="progress" style="display:none; padding: 20px; border: 20px solid #CCC; background: #EEE; width:40%; position:absolute; top:50%;left:30%">
+            <div id="progress" style="display:none; padding: 10px; border: 10px solid #CCC; background: #EEE; width:20%; position:absolute; top:50%;left:30%">
             </div>
 
             <div id="DIV_topmenu" style="position:absolute; top:30; left:0; height:7%; width:100%">
@@ -332,7 +332,7 @@
             reader.readAsText(files[CurrentFileId].slice(CurrentFileChunk*chunksize, (CurrentFileChunk+1)*chunksize));
 
             //progress display:
-            document.getElementById('progress').innerHTML = "File "+(CurrentFileId+1)+": "+Math.round(CurrentFileChunk*chunksize/1000000)+" MB processed.\t"+ "Readnumber" + id;
+            document.getElementById('progress').innerHTML = "File "+(CurrentFileId+1)+": "+Math.round(CurrentFileChunk*chunksize/1000000)+" MB processed";
         }
 
         function DrawPie()
