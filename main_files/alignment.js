@@ -1,24 +1,5 @@
 // Alignment algorithms
 // modified version of Smith Watermann algorithm from https://github.com/lh3/bioseq-js
-var bst_nt5 = [
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-        4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4
-    ];
-
 /**
  * Encode a sequence string with table
  *
@@ -90,7 +71,7 @@ function bsa_gen_query_profile(_s, _m, table)
 }
 
 /**
- * Local or global pairwise alignemnt
+ * Local pairwise alignemnt
  *
  * @param is_local  perform local alignment
  * @param target    target string
@@ -236,12 +217,13 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
     var aln_type = 0;
     for (var k = 0; k < cigar.length; ++k) {
         var op = cigar[k]&0xf, len = cigar[k]>>4;
+        //update breakpoints only, no update aln_type
         if (lt + len <= bkp11){
             if (op == 0) { // match
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
                 lq += len, lt += len;
-            } else if (op == 1) { // insertion
+            } else if (op == 1) { // insertion (only update bkp11, 22 for insertion in reference sequence)
                 oq += query.substr(lq, len);
                 ot += Array(len+1).join("-");
                 lq += len;
@@ -255,22 +237,33 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 lq += len;
             }
         }
+        // update aln_type ONE time, otherwise assign 'ambigous read' 
         else if (bkp22 >= lt+len){
-            if (op == 0) { // match
+            if (op == 0) { // match ! ONLY UPDATE ONCE
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
                 lq += len, lt += len;
-            } else if (op == 1) { // insertion
+                if (aln_type==0){
+                    aln_type = 1
+                }
+                ////////////////////////CONTINUE
+            } else if ((op == 1)||(op == 2)) { // in
                 oq += query.substr(lq, len);
                 ot += Array(len+1).join("-");
                 lq += len;
                 if (len%3 == 0){
-                    if (aln_type==0){
-                        aln_type = 1} // inframe insertion     
+                    if ((aln_type==0)||(aln_type==1)){
+                        aln_type = 2} // inframe insertion
+                    else {
+                        aln_type = 6  // ambigous
+                    }     
                 }
                 else{
-                    if (aln_type==0){
-                    aln_type =2 // outframe insertion
+                    if ((aln_type==0)||(aln_type==1)){
+                    aln_type =3 // outframe insertion
+                    }
+                    else {
+                        aln_type = 6  // ambigous
                     }
                 }
             } else if (op == 2) { // deletion
@@ -278,13 +271,19 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 ot += target.substr(lt, len);
                 lt += len;
                 if (len%3 == 0){
-                    if (aln_type==0){
-                        aln_type = 3 // inframe deletion
+                    if ((aln_type==0)||(aln_type==1)){
+                        aln_type = 4 // inframe deletion
+                    }
+                    else {
+                        aln_type = 6  // ambigous
                     }     
                 }
                 else{
-                    if (aln_type==0){
-                        aln_type =4 // outframe deletion
+                    if ((aln_type==0)||(aln_type==1)){
+                        aln_type =5 // outframe deletion
+                    }
+                    else {
+                        aln_type = 6  // ambigous
                     }
                 }
             } else if (op == 4) { // soft clip
@@ -296,35 +295,39 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
                 lq += len, lt += len;
-                //aln_type = 0 //no indel
+                if (aln_type==0){
+                    aln_type = 1 //no indel
+                }
+
             } else if (op == 1) { // insertion
                 oq += query.substr(lq, len);
                 ot += Array(len+1).join("-");
                 lq += len;
-                if ((bkp22-bkp11)%3 == 0){
+                if (len%3 == 0){
                     if (aln_type==0){
-                        aln_type = 1 // inframe insertion  
-                    }   
-                }
+                        aln_type = 2 // inframe insertion  
+                    }
+                    }
                 else{
                     if (aln_type==0){
-                        aln_type =2 // outframe insertion
-                    }
+                    aln_type =3 // outframe insertion
+                    } 
                 }
             } else if (op == 2) { // deletion
                 oq += Array(len+1).join("-");
                 ot += target.substr(lt, len);
                 lt += len;
-                if ((bkp22-bkp11)%3 == 0){
+                if (len%3 == 0){
                     if (aln_type==0){
-                        aln_type = 3 // inframe deletion
-                    }     
+                        aln_type = 4 // inframe deletion
+                    }                
                 }
                 else{
                     if (aln_type==0){
-                        aln_type =4 // outframe deletion
+                        aln_type = 5 // outframe deletion
                     }
                 }
+
             } else if (op == 4) { // soft clip
                 lq += len;
         }
@@ -345,3 +348,22 @@ function bsa_cigar2str(cigar)
 		s.push((cigar[k]>>4).toString() + "MIDNSHP=XB".charAt(cigar[k]&0xf));
 	return s.join("");
 }
+
+var bst_nt5 = [
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4
+];

@@ -100,7 +100,7 @@
     <script>
         //Top Menu:
         var SVGtab = new Array(10), SVGtabtext = new Array(10);
-        var tabtextcontent = ["Crispr Analyzer", "Results","About CRISPRNano"];
+        var tabtextcontent = ["Crispr Analyzer", "Results", "Track", "About CRISPRNano"];
         var BLAU=["rgb(0, 0, 0)","rgb(221,0,0)","rgb(255,206,0)"];
         function GenerateTopMenu()
         {
@@ -108,7 +108,7 @@
             svg.setAttributeNS(null, "onmousedown", "return false;");
             var NS="http://www.w3.org/2000/svg";
 
-            for (var i=0; i<3; i++)
+            for (var i=0; i<4; i++)
             {
                 SVGtab[i] = document.createElementNS(NS,"rect");
                 svg.appendChild(SVGtab[i]);
@@ -143,7 +143,10 @@
             if (i==1) document.getElementById("results").style.display = "";
             else document.getElementById("results").style.display = "none";
 
-            if (i==2) document.getElementById("about").style.display = "";
+            if (i==2) document.getElementById("results_temp").style.display = "";
+            else document.getElementById("results_temp").style.display = "none";
+
+            if (i==3) document.getElementById("about").style.display = "";
             else document.getElementById("about").style.display = "none";
 
             document.getElementById("progress").style.display = "none";
@@ -349,7 +352,7 @@
             //register mouse listener:
             svg.addEventListener("mousedown", PieClick, false);
 
-            var ROT= ["rgb(232,0,30)","rgb(255,102,0)","rgb(252,176,78)"]; //rgb(238,75,42)
+            var ROT= ["rgb(232,0,30)","rgb(255,102,0)","rgb(252,176,78)"]; 
             var BLAU=["rgb(50,42,126)","rgb(16,115,179)","rgb(38,170,220)"];
 
             var maxsum = 0;
@@ -372,25 +375,33 @@
                 var out_insert = 0;
                 var inf_del = 0;
                 var out_del = 0;
+                var not_align = 0;
+                var read_ambigous = 0;
 
                 for (var i=0; i<10000; i++){
                     if (hits[barcode][i]>=0){
                         sum++
                         switch (hits[barcode][i]){
                             case 0:
-                                no_indel++;
+                                not_align++;
                                 break;
                             case 1:
-                                inf_insert++;
+                                no_indel++;
                                 break;
                             case 2:
-                                out_insert++;
+                                inf_insert++;
                                 break;
                             case 3:
+                                out_insert++;
+                                break;
+                            case 4:
                                 inf_del++;
                                 break;
-                            case 4: 
+                            case 5: 
                                 out_del++;
+                                break;
+                            case 6: 
+                                read_ambigous++;
                                 break;
                         }
                     }
@@ -402,21 +413,88 @@
 
                 if (sum > 0)
                 {
-                    //wt zeichnen:
-                    var winkel = -3.1415/2;
-                    var lastwinkel = winkel;
-                    winkel+=2*3.1415*0.995*no_indel/sum;
+                    //wt:
+                    var angle = -3.1415/2;
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*no_indel/sum;
 
                     //SVG:
-                    var startx = size*Math.cos(lastwinkel);
-                    var starty = size*Math.sin(lastwinkel);
-                    var plusx = size*(Math.cos(winkel)-Math.cos(lastwinkel));
-                    var plusy = size*(Math.sin(winkel)-Math.sin(lastwinkel));
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
                     var largearc = 0;
-                    if (winkel-lastwinkel > 3.1415) largearc = 1;
+                    if (angle-lastangle > 3.1415) largearc = 1;
                     var SVGObj= document.createElementNS(NS,"path");
                     SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
                     SVGObj.style.fill="rgb(200,200,200)";
+
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // inframe insert
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*inf_insert/sum;
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(50,42,126)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // inframe delete
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*inf_del/sum;
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(16,115,179)";
+
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // outframe insert
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_insert/sum;
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(232,0,30)";
+
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+                    
+                    // outframe delete
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_del/sum;
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(255,102,0)";
 
                     SVGObj.setAttribute("pointer-events","none");
                     svg.appendChild(SVGObj);
@@ -429,15 +507,15 @@
 
                         if (hits[barcode][i][ii]*100/sum > /*MutationThreshold*/0.1)
                         {
-                            lastwinkel = winkel;
-                            winkel+=2*3.1415*0.995*hits[barcode][i][ii]/sum2;
+                            lastangle = angle;
+                            angle+=2*3.1415*0.995*hits[barcode][i][ii]/sum2;
                             //SVG:
-                            var startx = size*Math.cos(lastwinkel);
-                            var starty = size*Math.sin(lastwinkel);
-                            var plusx = size*(Math.cos(winkel)-Math.cos(lastwinkel));
-                            var plusy = size*(Math.sin(winkel)-Math.sin(lastwinkel));
+                            var startx = size*Math.cos(lastangle);
+                            var starty = size*Math.sin(lastangle);
+                            var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                            var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
                             var largearc = 0;
-                            if (winkel-lastwinkel > 3.1415) largearc = 1;
+                            if (angle-lastangle > 3.1415) largearc = 1;
                             var SVGObj= document.createElementNS(NS,"path");
                             SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
                             if (frameshift) SVGObj.style.fill=ROT[MutationNr%3];
@@ -455,16 +533,16 @@
                 //Draw rests:
                 if (RestFrameshift>0)
                 {
-                    lastwinkel = winkel;
-                    winkel+=2*3.1415*0.995*RestFrameshift/sum2;
+                    lastangle = angle;
+                    angle+=2*3.1415*0.995*RestFrameshift/sum2;
 
                     //SVG:
-                    var startx = size*Math.cos(lastwinkel);
-                    var starty = size*Math.sin(lastwinkel);
-                    var plusx = size*(Math.cos(winkel)-Math.cos(lastwinkel));
-                    var plusy = size*(Math.sin(winkel)-Math.sin(lastwinkel));
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
                     var largearc = 0;
-                    if (winkel-lastwinkel > 3.1415) largearc = 1;
+                    if (angle-lastangle > 3.1415) largearc = 1;
                     var SVGObj= document.createElementNS(NS,"path");
                     SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
                     SVGObj.style.fill=ROT[MutationNr%3];
@@ -474,15 +552,15 @@
                 }
                 if (RestNoFrameshift>0)
                 {
-                    lastwinkel = winkel;
-                    winkel+=2*3.1415*0.995*RestNoFrameshift/sum2;
+                    lastangle = angle;
+                    angle+=2*3.1415*0.995*RestNoFrameshift/sum2;
                     //SVG:
-                    var startx = size*Math.cos(lastwinkel);
-                    var starty = size*Math.sin(lastwinkel);
-                    var plusx = size*(Math.cos(winkel)-Math.cos(lastwinkel));
-                    var plusy = size*(Math.sin(winkel)-Math.sin(lastwinkel));
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
                     var largearc = 0;
-                    if (winkel-lastwinkel > 3.1415) largearc = 1;
+                    if (angle-lastangle > 3.1415) largearc = 1;
                     var SVGObj= document.createElementNS(NS,"path");
                     SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
                     SVGObj.style.fill=BLAU[MutationNr%3];
@@ -524,7 +602,6 @@
                 SVGObj.style.fill="none";
                 SVGObj.style.stroke="rgb(100,100,100)";
                 svg.appendChild(SVGObj);
-
                 var SVGObj= document.createElementNS(NS,"text");
                 SVGObj.setAttribute("font-family", "sans-serif");
                 SVGObj.setAttribute("font-weight", "100");
@@ -533,7 +610,6 @@
                 SVGObj.setAttribute("font-size", "12");
                 SVGObj.textContent = Math.round(vol) + " reads";
                 svg.appendChild(SVGObj);
-
                 midy += size*2+10;
             }
             for (var i=0; i<11; i++)
@@ -556,6 +632,7 @@
                 }
                 svg.appendChild(SVGObj);
             }
+
             var SVGObj= document.createElementNS(NS,"text");
             SVGObj.setAttribute("font-family", "sans-serif");
             SVGObj.setAttribute("font-weight", "100");
