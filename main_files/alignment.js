@@ -217,6 +217,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
     var aln_type = 0;
     for (var k = 0; k < cigar.length; ++k) {
         var op = cigar[k]&0xf, len = cigar[k]>>4;
+        var len1 = Math.floor(len/3)
         //update breakpoints only, no update aln_type
         if (lt + len <= bkp11){
             if (op == 0) { // match
@@ -246,51 +247,49 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 if (aln_type==0){
                     aln_type = 1
                 }
-                ////////////////////////CONTINUE
             } else if ((op == 1)||(op == 2)) { // Combine indels
                 oq += query.substr(lq, len);
                 ot += Array(len+1).join("-");
                 lq += len;
                 if (len%3 == 0){
                     if ((aln_type==0)||(aln_type==1)){
-                        aln_type = 2} // inframe insertion
+                        switch (len1%3){
+                            case 0:
+                                aln_type =2;
+                                break;
+                            case 1:
+                                aln_type =3;
+                                break;
+                            case 2: 
+                                aln_type = 4;
+                                break;
+                        }
+                    }
                     else {
-                        aln_type = 6  // ambigous
+                        aln_type = 8  // ambigous
                     }     
                 }
                 else{
                     if ((aln_type==0)||(aln_type==1)){
-                    aln_type =3 // outframe insertion
+                        switch (len%3){
+                            case 1:
+                                aln_type =5;
+                                break;
+                            case 2:
+                                aln_type = 6;
+                                break;
+                        }
                     }
                     else {
-                        aln_type = 6  // ambigous
+                        aln_type = 8  // ambigous
                     }
                 }
-            } else if (op == 2) { // deletion
-                oq += Array(len+1).join("-");
-                ot += target.substr(lt, len);
-                lt += len;
-                if (len%3 == 0){
-                    if ((aln_type==0)||(aln_type==1)){
-                        aln_type = 4 // inframe deletion
-                    }
-                    else {
-                        aln_type = 6  // ambigous
-                    }     
-                }
-                else{
-                    if ((aln_type==0)||(aln_type==1)){
-                        aln_type =5 // outframe deletion
-                    }
-                    else {
-                        aln_type = 6  // ambigous
-                    }
-                }
-            } else if (op == 4) { // soft clip
+            } 
+            else if (op == 4) { // soft clip
                 lq += len;
             }
         }
-        else {
+        else {   // bk point cover all windows
             if (op == 0) { // match
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
@@ -298,37 +297,39 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 if (aln_type==0){
                     aln_type = 1 //no indel
                 }
-
-            } else if (op == 1) { // insertion
+            } else if ((op == 1)||(op == 2)) { // indel 
                 oq += query.substr(lq, len);
                 ot += Array(len+1).join("-");
                 lq += len;
                 if (len%3 == 0){
                     if (aln_type==0){
-                        aln_type = 2 // inframe insertion  
+                        switch (len1%3){
+                            case 0:
+                                aln_type =2;
+                                break;
+                            case 1:
+                                aln_type =3;
+                                break;
+                            case 2: 
+                                aln_type = 4;
+                                break;
+                        }
                     }
                     }
                 else{
                     if (aln_type==0){
-                    aln_type =3 // outframe insertion
-                    } 
-                }
-            } else if (op == 2) { // deletion
-                oq += Array(len+1).join("-");
-                ot += target.substr(lt, len);
-                lt += len;
-                if (len%3 == 0){
-                    if (aln_type==0){
-                        aln_type = 4 // inframe deletion
-                    }                
-                }
-                else{
-                    if (aln_type==0){
-                        aln_type = 5 // outframe deletion
+                        switch (len%3){
+                            case 1:
+                                aln_type =5;
+                                break;
+                            case 2:
+                                aln_type = 6;
+                                break;
+                        }
                     }
                 }
-
-            } else if (op == 4) { // soft clip
+            } 
+            else if (op == 4) { // soft clip
                 lq += len;
         }
         }    
