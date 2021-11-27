@@ -247,7 +247,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                     aln_type = 1
                 }
                 ////////////////////////CONTINUE
-            } else if ((op == 1)||(op == 2)) { // in
+            } else if ((op == 1)||(op == 2)) { // Combine indels
                 oq += query.substr(lq, len);
                 ot += Array(len+1).join("-");
                 lq += len;
