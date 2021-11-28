@@ -1,8 +1,8 @@
 // Alignment algorithms
-// modified version of Smith Watermann algorithm from https://github.com/lh3/bioseq-js
+// modified version of Smith Watermann algorithm 
+// the JS API from implementation by Prof Heng Li at https://github.com/lh3/bioseq-js
 /**
  * Encode a sequence string with table
- *
  * @param seq    sequence
  * @param table  encoding table; must be of size 256
  *
