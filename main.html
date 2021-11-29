@@ -292,7 +292,7 @@
                         str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
                         str1 += 'alignment:\n';
                         var linelen = 200, n_lines = 10;
-                        var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse, BreakPoint +region_analyse);
+                        var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
                         //alert(fmt1)
                         var fmt = fmt1[0]
                         aln_type = fmt1[1]
@@ -557,7 +557,7 @@
                     if (angle-lastangle > 3.1415) largearc = 1;
                     var SVGObj= document.createElementNS(NS,"path");
                     SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
-                    SVGObj.style.fill="rgb(10,10,10)";
+                    SVGObj.style.fill="rgb(70,70,70)";
                     SVGObj.setAttribute("pointer-events","none");
                     svg.appendChild(SVGObj);
                     
@@ -618,7 +618,7 @@
                 if (i>=4 && i<6) SVGObj.style.fill=ROT[i-4];
                 if (i==7) SVGObj.style.fill="rgb(200,200,200)";
                 if (i==8) SVGObj.style.fill="rgb(0,200,0)";
-                if (i==9) SVGObj.style.fill="rgb(10,10,10)";
+                if (i==9) SVGObj.style.fill="rgb(70,70,70)";
                 if (i==10)
                 {
                     SVGObj.style.fill="none";
