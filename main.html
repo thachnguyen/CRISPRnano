@@ -65,7 +65,7 @@
 
             <div id="results" style="position: absolute; left: 20px; top: 160px; display: none;">
                 <div id="DIV_piecharts">
-                    <svg id="SVGpie" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="900" height="520">
+                    <svg id="SVGpie" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="900" height="1040">
                     </svg>
                 </div>
                 <div id="DIV_alignment">
@@ -273,6 +273,7 @@
                 var phred = original.slice(cursor3+1,cursor4); //lines[readnum*4+3];
                 var readlen = read.length;
                 var aln_type;
+                var aln_type_str = ['not_aligned', 'no indel', 'IN indel 1','IN indel 2','IN indel 3', 'OUT indel 1','OUT indel 2', 'targetingOligo', 'ambigous read']
                 var target = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
                 var targetingOligo = document.getElementsByName("TargetingOligo")[0].value.toUpperCase(); //TargetingOligo
                 if ((targetingOligo !="") &&read.includes(targetingOligo)){
@@ -286,23 +287,23 @@
 
                     if (rst1[0]> RightBsLen/2 +1){
                         var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
-                        var str1 = 'file_id' +id+ ';  read number:' + readnum +'\n';
+                        var str1 = 'file_id ' +id+ ';  read number: ' + readnum +'\n';
                         str1 += 'score: ' + rst[0] + '\n';
                         str1 += 'start: ' + rst[1] + '\n';
                         str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
-                        str1 += 'alignment:\n';
-                        var linelen = 200, n_lines = 10;
+                        str1 += 'alignment track:\n';
+                        var linelen = 200;
                         var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
                         //alert(fmt1)
                         var fmt = fmt1[0]
                         aln_type = fmt1[1]
-                        for (var l = 0; l < fmt[0].length; l += linelen) {
-                            str1 += fmt[0].substr(l, linelen) + '\n';
-                            str1 += fmt[2].substr(l, linelen) + '\n';
-                            str1 += fmt[1].substr(l, linelen) + '\n\n';
-                            str1 += aln_type + '\n';
-                            n_lines += 4;
-                        }
+                        
+                        str1 += fmt[0] + '\n';
+                        str1 += fmt[1] + '\n';
+                        str1 += fmt[2] + '\n';
+                        str1 += fmt[3] + '\n';
+                        str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
+                        
                         str +=str1
                         document.getElementById('out').value = str
                     }
@@ -705,41 +706,15 @@
 
         function GetWellPos(i)
         {
-            var ABC = "ABCDEFGH";
-            return ABC[Math.floor(i/12)] + ((i%12)+1);
+            var ABC = "ABCDEFGHIJKL";
+            return ABC[Math.floor(i/16)] + ((i%16)+1);
         }
 
-        //Alignment plot:
+        //Alignment summary plot:
         function CalcAlignment(hits, barcode, locus)
         {
-            var yproj = 2;
-            var ysize = 30;
-            var maxdel = 70;
-            var xfrom = RightBsPos-20, xto = xfrom+80;
-            if (xto >= locus.length)
-            {
-                xfrom = locus.length-80;
-                xto = locus.length;
-            }
-            if (xto >= 250)
-            {
-                xfrom = 250-80;
-                xto = 250;
-            }
-            var xsize = xto-xfrom;
-
-            //Find Max:
+          //Find Max:
             var max=0;
-            for (var x=xfrom; x<xto; x++)
-            for (var y=0; y<maxdel; y++)
-			if (hits[x][y] > max)
-            max = hits[x][y];
-            var maxfactor = 1;
-            if (max>0) maxfactor = 130/max;
-
-            var sum = 0; for (var i=0; i<250; i++) for (var ii=0; ii<150; ii++) sum += hits[i][ii];
-            sum += ShiftUnresolved[barcode];
-
             var svg = document.getElementById("SVGmut");
             var NS="http://www.w3.org/2000/svg";
             var strokew = "0.5";
