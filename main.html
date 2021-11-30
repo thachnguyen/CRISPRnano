@@ -163,8 +163,8 @@
         var hits = Array(192);
         for (var i=0; i<192; i++)
         {
-            hits[i] = Array(1000);
-            for (var ii=0; ii<1000; ii++)
+            hits[i] = Array(10000);
+            for (var ii=0; ii<10000; ii++)
             {
                 hits[i][ii] = -1;
             }
@@ -275,25 +275,25 @@
                 var phred = original.slice(cursor3+1,cursor4); //lines[readnum*4+3];
                 var readlen = read.length;
                 var aln_type;
-                var target = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
+                var target1 = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
 
-                // minimize reference focus on break point (+/-80 bp) to speed up
-                // if (BreakPoint <= locuslen - 80){
-                //     if (BreakPoint >= 80){
-                //         target = target1.substr(BreakPoint-80, 160)
-                //     }
-                //     else{
-                //         target = target1.substr(0, BreakPoint +80)
-                //     }
-                // }
-                // else{
-                //     if (BreakPoint >= 80){
-                //         target = target1.substr(BreakPoint-80, locuslen-BreakPoint+80)
-                //     }
-                //     else{
-                //         target = target1
-                //     }
-                // }
+                //minimize reference focus on break point (+/-80 bp) to speed up
+                if (BreakPoint <= locuslen - 80){
+                    if (BreakPoint >= 80){
+                        target = target1.substr(BreakPoint-80, 160)
+                    }
+                    else{
+                        target = target1.substr(0, BreakPoint +80)
+                    }
+                }
+                else{
+                    if (BreakPoint >= 80){
+                        target = target1.substr(BreakPoint-80, locuslen-BreakPoint+80)
+                    }
+                    else{
+                        target = target1
+                    }
+                }
 
                 var targetingOligo = document.getElementsByName("TargetingOligo")[0].value.toUpperCase(); //TargetingOligo
                 if ((targetingOligo !="") &&read.includes(targetingOligo)){
@@ -305,7 +305,7 @@
                     //1st step to check part of sgRNA in the read? use small flunctuate in alignment score
                     var rst1 = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
 
-                    if (rst1[0]> RightBsLen/2 +1){
+                    if (rst1[0]> (RightBsLen- 3)){
                         var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
                         var str1 = 'file_id' +id+ ';  read number:' + readnum +'\n';
                         str1 += 'score: ' + rst[0] + '\n';
@@ -326,10 +326,13 @@
                         }
                         str +=str1
                         document.getElementById('out').value = str
+                        hits[id][readnum] = aln_type
+                        readnum++
                     }
-                    hits[id][readnum] = aln_type
-                    readnum++;
-                
+                    else{
+                        hits[id][readnum] = 0
+                        readnum++;
+                    }              
                 }
             }
             RestFromLastChunk = original.substr(cursor);
@@ -388,7 +391,7 @@
             {
                 var sum = 0;
                 for (var i=0; i<10000; i++){
-                    if (hits[barcode][i]>=0){
+                    if (hits[barcode][i]>=1){
                         sum++
                     }
                 }
@@ -409,7 +412,7 @@
                 var read_ambigous = 0;
 
                 for (var i=0; i<10000; i++){
-                    if (hits[barcode][i]>=0){
+                    if (hits[barcode][i]>=1){
                         sum++
                         switch (hits[barcode][i]){
                             case 0:
@@ -450,6 +453,7 @@
                 if (sum > 0)
                 {
                     //wt:
+                    alert(sum)
                     var angle = -3.1415/2;
                     var lastangle = angle;
                     angle+=2*3.1415*0.995*no_indel/sum;
