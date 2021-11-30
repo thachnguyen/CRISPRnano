@@ -15,13 +15,13 @@
                 <br>
                 <br>FASTQ Files: <a href="javascript:alert(&#39; Your input files your CRISPR experiment data, make sure that the correct ordering is applied in the file browser. The file allocation to individual pie charts can be verified by the numbers given below the output pie charts.&#39;)">(?)</a> <br><input type="file" id="files" name="files[]" multiple=""><br><br> 
                 <br>Barcode Files (optional): <a href="javascript:alert(&#39; Your input barcode files your CRISPR experiment data, make sure that the correct ordering of barcode. The file must be in fasta format by the numbers given below the output pie charts.&#39;)">(?)</a> <br><input type="file" id="barcode_files" name="files[]" multiple=""><br><br>
-                <br>Reference Sequence: <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" size="100" name="Locus" value="ACTGTCCCTCTTTCCCATACACTGCCCCACAACTGTTTGTGTGTACAGTTCCTTGCTTACCTCTTCAAAGGTATGTTCCACATCTTCAATCAACTGGCCGCGGCTGTAGTCATAGCCATCTACCCCATTTACTTCATAGTCTCCTCTCCAATAATCCCCA"><br>
+                <br>Reference Sequence: <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" size="140" name="Locus" value="ACTGTCCCTCTTTCCCATACACTGCCCCACAACTGTTTGTGTGTACAGTTCCTTGCTTACCTCTTCAAAGGTATGTTCCACATCTTCAATCAACTGGCCGCGGCTGTAGTCATAGCCATCTACCCCATTTACTTCATAGTCTCCTCTCCAATAATCCCCA"><br>
                 <br>Nuclease Target Site: <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" size="40" name="RightBS" value="CATCTTCAATCAACTGGCCG"><br>
                 <br>Analysing region (optional) +/-: <a href="javascript:alert(&#39;it is recommended to use only the +/-5 bases surrounding the desired breaking point.&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10"><br>
                 <br>Targeting mutagenesis oligonucleotide (optional): <a href="javascript:alert(&#39;If a donor oligonucleotide was used to introduce a site specific genomic alteration (e.g. a single nucleotide base exchange), the respective sequence should be entered here. Please note that the sequence entered must be in the same orientation as the amplicon sequence.&#39;)">(?)</a><br><input type="text" size="40" name="TargetingOligo" value=""><br>
                 <!-- <br>Indel Threshold [%]: <a href="javascript:alert(&#39;The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered (default is 5 %).&#39;)">(?)</a><br><input type="text" size="20" name="MutationThreshold" value="5"><br>-->
                 <!--<br>Phred Score Threshold: <a href="javascript:alert(&#39;A Phred Score Threshold is used to specifically consider the read quality of the two bases surrounding the indel position (one base preceding, one base following the indel position). We recommend a default Phred Score Threshold of 12, yet depending on the sequencing quality adjustments should be considered.&#39;)">(?)</a><br><input type="text" size="20" name="PhredThreshold" value="12"><br>-->
-                <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" size="100" name="GeneName" value="ACE2"><br>
+                <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" size="30" name="GeneName" value="ACE2"><br>
                <br>
                 <button onclick="Start();">START</button>
                 <br><br>
@@ -102,6 +102,10 @@
         var SVGtab = new Array(10), SVGtabtext = new Array(10);
         var tabtextcontent = ["Crispr Analyzer", "Results", "Track", "About CRISPRNano"];
         var BLAU=["rgb(0, 0, 0)","rgb(221,0,0)","rgb(255,206,0)"];
+        var files;
+        var reader;
+        var CurrentFileId, CurrentFileChunk;
+        var MutationThreshold = 0, PhredThreshold = 12;
         function GenerateTopMenu()
         {
             var svg = document.getElementById("SVG_topmenu");
@@ -156,11 +160,10 @@
         GenerateTopMenu();
         TabClicked(0);
         
-        var RightBsPos=0, RightBsLen=0;
         var hits = Array(192);
         for (var i=0; i<192; i++)
         {
-            hits[i] = Array(10000);
+            hits[i] = Array(1000);
             for (var ii=0; ii<1000; ii++)
             {
                 hits[i][ii] = -1;
@@ -169,15 +172,6 @@
 
         var AlignmentPrecalc = new Array(192);
  
-        var locus, locuslen;
-        var files;
-        var reader;
-        var CurrentFileId, CurrentFileChunk;
-        var MutationThreshold = 0, PhredThreshold = 12;
-        var rightbs;
-                    //breaking point on locus 
-        var BreakPoint = RightBsPos + RightBsLen
-
         //reverse comp function
         function ReverseComplement(A)
         {
@@ -195,15 +189,17 @@
         function Start()
         {
             document.getElementById("progress").style.display = '';
-            locus = document.getElementsByName("Locus")[0].value.toUpperCase(); //reference sequence
-            locuslen = locus.length; 
-            rightbs = document.getElementsByName("RightBS")[0].value.toUpperCase(); // sgRNA seq  
-            RightBsLen = rightbs.length;
+            var locus = document.getElementsByName("Locus")[0].value.toUpperCase(); //reference sequence
+            var locuslen = locus.length; 
+            var rightbs = document.getElementsByName("RightBS")[0].value.toUpperCase(); // sgRNA seq  
+            var RightBsLen = rightbs.length;
+            //breaking point on locus 
+            var region_analyse = document.getElementsByName("region_analyse")[0].value*1;
+            var RightBsPos = locus.search(rightbs);
+            var BreakPoint = RightBsPos + RightBsLen
 
             //MutationThreshold = document.getElementsByName("MutationThreshold")[0].value;
             //PhredThreshold = document.getElementsByName("PhredThreshold")[0].value*1 + 33;  //Phred quality score
-
-            region_analyse = document.getElementsByName("region_analyse")[0].value;
 
             //Find Target site in the wild type sequence:
             if (RightBsLen == 0)
@@ -211,7 +207,6 @@
                 alert("No target site was entered. Please enter a valid sequence");
                 return;
             }
-            RightBsPos = locus.search(rightbs);
             if (RightBsPos == -1)
             {
                 RightBsPos = locus.search(ReverseComplement(rightbs));
@@ -240,6 +235,14 @@
 
         function FileReceived()
         {
+            var locus = document.getElementsByName("Locus")[0].value.toUpperCase(); //reference sequence
+            var locuslen = locus.length; 
+            var rightbs = document.getElementsByName("RightBS")[0].value.toUpperCase(); // sgRNA seq  
+            var RightBsLen = rightbs.length;
+            //breaking point on locus 
+            var region_analyse = document.getElementsByName("region_analyse")[0].value*1;
+            var RightBsPos = locus.search(rightbs);
+            var BreakPoint = RightBsPos + RightBsLen
             var original = RestFromLastChunk+reader.result;
             var cursor = 0, origlen = original.length;
             // alignment parameter for affine score DP algorithms 
@@ -273,10 +276,26 @@
                 var readlen = read.length;
                 var aln_type;
                 var aln_type_str = ['not_aligned', 'no indel', 'IN indel 1','IN indel 2','IN indel 3', 'OUT indel 1','OUT indel 2', 'targetingOligo', 'ambigous read']
-                var target1 = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
+                var target = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
+
                 // minimize reference focus on break point (+/-80 bp) to speed up
-                if 
-                var target = target1[]
+                // if (BreakPoint <= locuslen - 80){
+                //     if (BreakPoint >= 80){
+                //         target = target1.substr(BreakPoint-80, 160)
+                //     }
+                //     else{
+                //         target = target1.substr(0, BreakPoint +80)
+                //     }
+                // }
+                // else{
+                //     if (BreakPoint >= 80){
+                //         target = target1.substr(BreakPoint-80, locuslen-BreakPoint+80)
+                //     }
+                //     else{
+                //         target = target1
+                //     }
+                // }
+
                 var targetingOligo = document.getElementsByName("TargetingOligo")[0].value.toUpperCase(); //TargetingOligo
                 if ((targetingOligo !="") &&read.includes(targetingOligo)){
                     aln_type = 7;
@@ -312,8 +331,8 @@
                     hits[id][readnum] = aln_type
                     readnum++;
                 
+                }
             }
-        }
             RestFromLastChunk = original.substr(cursor);
 
             //lines = "";
@@ -883,21 +902,6 @@
             svg.appendChild(SVGObj);
             delypos+=delyshift;
 
-            //Alignment Dropouts:
-            /*var SVGObj= document.createElementNS(NS,"text");
-            SVGObj.setAttribute("x", 10);
-            SVGObj.setAttribute("y", ysize+delypos);
-            SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent += "FAILED ALIGNMENT";
-            svg.appendChild(SVGObj);
-            var SVGObj= document.createElementNS(NS,"text");
-            SVGObj.setAttribute("x", 100+12*(xto+3-xfrom));
-            SVGObj.setAttribute("y", ysize+delypos);
-            SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent = ""+Math.round(ShiftUnresolved[barcode]*100/sum)+"% ("+ShiftUnresolved[barcode]+" reads)";
-            svg.appendChild(SVGObj);
-            delypos+=delyshift;*/
-
             //Phred Dropouts:
             var SVGObj= document.createElementNS(NS,"text");
             SVGObj.setAttribute("x", 10);
@@ -1007,4 +1011,5 @@
         }
 
     </script>
+
 </html>
