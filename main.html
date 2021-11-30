@@ -1,7 +1,7 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><meta http-equiv="Content-Script-Type" content="text/javascript">
     <script language="JavaScript" src="./main_files/alignment.js" ></script>
     <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
-        <title>CrispNano</title>
+        <title>CRISPRnano</title>
         </head>
         <h1>CRISPRnano: a feature weight webserver for analyzing long-read genome editing </h1>
         <body background="./main_files/theme.jpg" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body>
@@ -34,7 +34,7 @@
                 <br>
                 <b>About:</b>
                 <br>
-                <br>CRISPRNano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones. Crispnano supports noisy Oxford Nanopore, Illumina as well as other sequencing data.  
+                <br>CRISPRNano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones. CRISPRnano supports noisy Oxford Nanopore, Illumina as well as other sequencing data.  
                 CRISPRNano was developed by Thach Nguyen in the group of Andrea Rossi, Leibniz Research Institute for Environmental Medicine.
                 The template, data input, output are developped base on the template of Outknocker http://www.outknocker.org/. 
                 <br>
@@ -52,12 +52,11 @@
                 <br>
                 <br><b>Licence:</b>
                 <br>
-                <br>CRISPRNano can be redistributed and/or modified under the terms of the GNU General Public License (Version 2), as published by the Free Software Foundation. A copy of the license can be found online at www.gnu.org/licenses. Crispnano is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.
+                <br>CRISPRNano can be redistributed and/or modified under the terms of the GNU General Public License (Version 2), as published by the Free Software Foundation. A copy of the license can be found online at www.gnu.org/licenses. CRISPRnano is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.
                 <br>
                 <br><b>Citing CRISPRNano:</b>
                 <br>
                 <br>We kindly request that use of this software be cited in publications as:
-                <br>
                 <br>
                 <br>
               <br><br>
@@ -176,6 +175,8 @@
         var CurrentFileId, CurrentFileChunk;
         var MutationThreshold = 0, PhredThreshold = 12;
         var rightbs;
+                    //breaking point on locus 
+        var BreakPoint = RightBsPos + RightBsLen
 
         //reverse comp function
         function ReverseComplement(A)
@@ -220,8 +221,6 @@
                     return;
                 }
             }
-            //breaking point on locus 
-            BreakPoint = RightBsPos + RightBsLen
         
             var evt = document.getElementById('files');
             files = evt.files;
@@ -274,7 +273,10 @@
                 var readlen = read.length;
                 var aln_type;
                 var aln_type_str = ['not_aligned', 'no indel', 'IN indel 1','IN indel 2','IN indel 3', 'OUT indel 1','OUT indel 2', 'targetingOligo', 'ambigous read']
-                var target = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
+                var target1 = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
+                // minimize reference focus on break point (+/-80 bp) to speed up
+                if 
+                var target = target1[]
                 var targetingOligo = document.getElementsByName("TargetingOligo")[0].value.toUpperCase(); //TargetingOligo
                 if ((targetingOligo !="") &&read.includes(targetingOligo)){
                     aln_type = 7;
