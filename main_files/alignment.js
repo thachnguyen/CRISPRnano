@@ -211,7 +211,7 @@ function bsa_cigar2gaps(target, query, start, cigar)
 // generate cigar to gap in breakpoint windows
 function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
 {
-	var oq = '', ot = '', mid = '', oq1 = '', lq = 0, lt = start;
+	var oq = '', ot = '', mid = '', lq = 0, lt = start;
 	var bkp11 = bkp1;
     var bkp22 = bkp2;
     var aln_type = 0;
@@ -223,11 +223,10 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
             if (op == 0) { // match
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
-                oq1 += Array(len).fill('\xa0').join('');
                 lq += len, lt += len;
             } else if (op == 1) { // insertion (only update bkp11, 22 for insertion in reference sequence)
-                oq1 += query.substr(lq, len);
-                //ot += Array(len+1).join("-");
+                oq += query.substr(lq, len);
+                ot += Array(len+1).join("-");
                 lq += len;
                 bkp11 += len
                 bkp22 += len
@@ -235,7 +234,6 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 oq += Array(len+1).join("-");
                 ot += target.substr(lt, len);
                 lt += len;
-                oq1 += Array(len).fill('\xa0').join('');
             } else if (op == 4) { // soft clip
                 lq += len;
             }
@@ -245,21 +243,13 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
             if (op == 0) { // match ! ONLY UPDATE ONCE
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
-                oq1 += Array(len).fill('\xa0').join('');
                 lq += len, lt += len;
                 if (aln_type==0){
                     aln_type = 1
                 }
             } else if ((op == 1)||(op == 2)) { // Combine indels
-                // ot += Array(len+1).join("-");
-                if (op == 1) {
-                    oq1 += query.substr(lq, len);
-                }
-                else if (op == 2){
-                    ot += target.substr(lt, len);
-                    oq1 += Array(len).fill('\xa0').join('');
-                    oq += Array(len+1).join("-");
-                } 
+                oq += query.substr(lq, len);
+                ot += Array(len+1).join("-");
                 lq += len;
                 if (len%3 == 0){
                     if ((aln_type==0)||(aln_type==1)){
@@ -303,21 +293,13 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
             if (op == 0) { // match
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
-                oq1 += Array(len).fill('\xa0').join('');
                 lq += len, lt += len;
                 if (aln_type==0){
                     aln_type = 1 //no indel
                 }
-            } else if ((op == 1)||(op == 2)) { // indel
-                if (op == 1) {
-                    oq1 += query.substr(lq, len);
-                }
-                else if (op == 2){
-                    ot += target.substr(lt, len);
-                    oq1 += Array(len).fill('\xa0').join('');
-                    oq += Array(len+1).join("-");
-                }  
-
+            } else if ((op == 1)||(op == 2)) { // indel 
+                oq += query.substr(lq, len);
+                ot += Array(len+1).join("-");
                 lq += len;
                 if (len%3 == 0){
                     if (aln_type==0){
@@ -356,7 +338,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
 	var uq = oq.toUpperCase();
 	for (var k = 0; k < ut.length; ++k)
 		mid += ut.charAt(k) == uq.charAt(k)? '|' : ' ';
-	return [[ot, mid, oq, oq1], aln_type];
+	return [[ot, oq, mid], aln_type];
     //return [[ot.substr(bkp11, bkp22-bkp11), oq.substr(bkp11, bkp22-bkp11), mid.substr(bkp11, bkp22-bkp11)], aln_type];
 }
 
