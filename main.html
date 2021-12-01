@@ -272,26 +272,7 @@
                 var phred = original.slice(cursor3+1,cursor4); //lines[readnum*4+3];
                 var readlen = read.length;
                 var aln_type;
-                var target1 = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
-
-                //minimize reference focus on break point (+/-80 bp) to speed up
-                if (BreakPoint <= locuslen - 80){
-                    if (BreakPoint >= 80){
-                        target = target1.substr(BreakPoint-80, 160)
-                    }
-                    else{
-                        target = target1.substr(0, BreakPoint +80)
-                    }
-                }
-                else{
-                    if (BreakPoint >= 80){
-                        target = target1.substr(BreakPoint-80, locuslen-BreakPoint+80)
-                    }
-                    else{
-                        target = target1
-                    }
-                }
-
+                var target = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
                 var targetingOligo = document.getElementsByName("TargetingOligo")[0].value.toUpperCase(); //TargetingOligo
                 if ((targetingOligo !="") &&read.includes(targetingOligo)){
                     aln_type = 7;
