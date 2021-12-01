@@ -161,11 +161,7 @@
         for (var i=0; i<192; i++)
         {
             hits[i] = Array(10000);
-<<<<<<< HEAD
             for (var ii=0; ii<10000; ii++)
-=======
-            for (var ii=0; ii<1000; ii++)
->>>>>>> parent of 61650fd... synced
             {
                 hits[i][ii] = -1;
             }
@@ -276,7 +272,6 @@
                 var phred = original.slice(cursor3+1,cursor4); //lines[readnum*4+3];
                 var readlen = read.length;
                 var aln_type;
-<<<<<<< HEAD
                 var target1 = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
 
                 //minimize reference focus on break point (+/-80 bp) to speed up
@@ -297,13 +292,6 @@
                     }
                 }
 
-=======
-                var aln_type_str = ['not_aligned', 'no indel', 'IN indel 1','IN indel 2','IN indel 3', 'OUT indel 1','OUT indel 2', 'targetingOligo', 'ambigous read']
-                var target1 = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
-                // minimize reference focus on break point (+/-80 bp) to speed up
-                if 
-                var target = target1[]
->>>>>>> parent of 61650fd... synced
                 var targetingOligo = document.getElementsByName("TargetingOligo")[0].value.toUpperCase(); //TargetingOligo
                 if ((targetingOligo !="") &&read.includes(targetingOligo)){
                     aln_type = 7;
@@ -338,17 +326,11 @@
                         hits[id][readnum] = aln_type
                         readnum++
                     }
-<<<<<<< HEAD
                     else{
                         hits[id][readnum] = 0
                         readnum++;
                     }              
-                }
-=======
-                    hits[id][readnum] = aln_type
-                    readnum++;
                 
->>>>>>> parent of 61650fd... synced
             }
         }
             RestFromLastChunk = original.substr(cursor);
