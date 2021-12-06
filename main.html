@@ -8,6 +8,11 @@
         font-size:30px;
         }
 
+        .column {
+        float: left;
+        width: 50%;
+
+        }
         .input_form {
         border-radius: 6px;
         border: 2px solid #0c0c0c;
@@ -17,7 +22,7 @@
         border: 2px solid #0c0c0c;
         }
         .button {
-        background-color: #b9def0; /* Green */
+        background-color: #b9def0; 
         border: 2px solid #0c0c0c;
         border-radius: 10px;
         color: rgb(8, 8, 8);
@@ -30,33 +35,6 @@
         cursor: pointer;
         }
 
-        /* .help {
-        width: 20px;
-        margin: 0 auto;
-        }
-
-        .help .question {
-        height: 20px;
-        width: 20px;
-        background: #ccc;
-        font-size: 12px;
-        line-height: 12px;
-        text-align: center;
-        border-radius: 50%;
-        cursor: pointer;
-        }
-
-        .help .popup, .help .popup2 {
-        width: 560px;
-        height: 0px;
-        text-align: left;
-        overflow: hidden;
-        position: relative;
-        background: #eee;
-        opacity: 0;
-        transition: 1s;
-        } */
-
     </style>
     <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
         <title>CrispNano</title>
@@ -64,10 +42,7 @@
         <h1>CRISPRnano: a feature weight webserver for analyzing long-read genome editing </h1>
         <body background="./main_files/theme.jpg" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body>
          <br>
-         CRISPRNano website is free and open to all users and there is no login requirement
-         <br>
          <div id="save" style="display:none">test</div>
-
             <div id="setup" style="position:absolute; left:20px; top:80px">
                 <br>
                 <br>
@@ -81,22 +56,26 @@
                         </div>
                     </div>
                 </div> -->
-                <div>
-                    FASTQ Files (*): <a href="javascript:alert(&#39; Your input files your CRISPR experiment data, make sure that the correct ordering is applied in the file browser. The file allocation to individual pie charts can be verified by the numbers given below the output pie charts.&#39;)">(?)</a> 
-                    <br><input type="file" id="files" class="input_form" name="files[]" multiple="">
+                <div class="column">
+                FASTQ Files (*): <a href="javascript:alert(&#39; Your input files your CRISPR experiment data, make sure that the correct ordering is applied in the file browser. We recommend file's size smaller than 200 MB. The file allocation to individual pie charts can be verified by the numbers given below the output pie charts.&#39;)">(?)</a> 
+                    <br><input type="file" id="files" class="input_form" name="files[]" multiple=""><br><br>
+    
                 </div>
-                <div style="width: 50%;">
+                <div class="column">
                     Barcode Files (optional): <a href="javascript:alert(&#39; Your input barcode files your CRISPR experiment data, make sure that the correct ordering of barcode. The file must be in fasta format by the numbers given below the output pie charts.&#39;)">(?)</a> 
-                    <br><input type="file" id="barcode_files" class="input_form" name="files[]" multiple="">
+                    <br><input type="file" id="barcode_files" class="input_form" name="files[]" multiple=""> <br><br>
                 </div>
 
-                <br>Reference Sequence (*): <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" class="input_form" size="100" name="Locus" value="ACTGTCCCTCTTTCCCATACACTGCCCCACAACTGTTTGTGTGTACAGTTCCTTGCTTACCTCTTCAAAGGTATGTTCCACATCTTCAATCAACTGGCCGCGGCTGTAGTCATAGCCATCTACCCCATTTACTTCATAGTCTCCTCTCCAATAATCCCCA"><br>
+                
+                <br>Reference Sequence (*): <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" class="input_form" size="65" name="Locus" value="ACTGTCCCTCTTTCCCATACACTGCCCCACAACTGTTTGTGTGTACAGTTCCTTGCTTACCTCTTCAAAGGTATGTTCCACATCTTCAATCAACTGGCCGCGGCTGTAGTCATAGCCATCTACCCCATTTACTTCATAGTCTCCTCTCCAATAATCCCCA"><br>
                 <br>Nuclease Target Site (*): <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="RightBS" value="CATCTTCAATCAACTGGCCG"><br>
-                <br>Analysing region (optional) +/-: <a href="javascript:alert(&#39;it is recommended to use only the +/-5 bases surrounding the desired breaking point.&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
+                <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely false discover ratio you can get because of noisy data.&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
                 <br>Targeting mutagenesis oligonucleotide (optional): <a href="javascript:alert(&#39;If a donor oligonucleotide was used to introduce a site specific genomic alteration (e.g. a single nucleotide base exchange), the respective sequence should be entered here. Please note that the sequence entered must be in the same orientation as the amplicon sequence.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="TargetingOligo" value=""><br>
                 <!-- <br>Indel Threshold [%]: <a href="javascript:alert(&#39;The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered (default is 5 %).&#39;)">(?)</a><br><input type="text" size="20" name="MutationThreshold" value="5"><br>-->
                 <!--<br>Phred Score Threshold: <a href="javascript:alert(&#39;A Phred Score Threshold is used to specifically consider the read quality of the two bases surrounding the indel position (one base preceding, one base following the indel position). We recommend a default Phred Score Threshold of 12, yet depending on the sequencing quality adjustments should be considered.&#39;)">(?)</a><br><input type="text" size="20" name="PhredThreshold" value="12"><br>-->
-                <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" class="input_form" size="100" name="GeneName" value="ACE2"><br>
+                <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="GeneName" value="ACE2"><br><br>
+                <a style="font-style: italic;">
+                    CRISPRnano website is free and open to all users and there is no login requirement<br><br></a>
                 <a style="font-style: italic;"> (*) Mandatory field </a>
                 <br>
                
@@ -106,7 +85,7 @@
                 <br>
             </div>
         
-            <div id="about" style="position: absolute; left: 20px; top: 240px; width: 70%; display: none;">
+            <div id="about" style="position: absolute; left: 20px; top: 120px; width: 70%; display: none;">
                 <br>
                 <br>
                 <b>About:</b>
@@ -119,13 +98,15 @@
                 <br>
                 <br>Thach Nguyen
                 <br>IUF Institute for Environmental Medicine
-                <br>thach.nguyen(remove this brackets) at iuf-duesseldorf.de
+                <br>thach.nguyen@iuf-duesseldorf.de
                 <br>
                 <br><b>Compatibility:</b>
                 <br>
                 <br>CRISPRNano was successfully tested on:
-                <br><li>Mozilla Firefox version 93.0
-                <br></li><li>Google Chrome version 95.0.4638.54
+                <br><li>Mozilla Firefox version 93.0 (Window10 and Linux)<br></li>
+                <li>Google Chrome version 95.0.4638.54 (Window10 and Linux)<br></li>
+                <li>Edge version (Window 10)<br></li>
+                <li>Safari version (MacOS)<br></li>
                 <br>
                 <br><b>Licence:</b>
                 <br>
@@ -134,9 +115,7 @@
                 <br><b>Citing CRISPRNano:</b>
                 <br>
                 <br>We kindly request that use of this software be cited in publications as:
-                <br>
-                <br>
-                <br>
+                <br>   
               <br><br>
             </li></div>
 
@@ -254,14 +233,25 @@
         var MutationThreshold = 0, PhredThreshold = 12;
         var rightbs;
         var aln_tracks = Array(192);
+        var aln_loc_seq = Array(192)
         for (var i=0; i<192; i++)
         {
             aln_tracks[i] = ''
-            // aln_tracks[i] = Array(10000);
-            // for (var ii=0; ii<10000; ii++)
-            // {
-            //     aln_tracks[i][ii] = '';
-            // }
+        }
+        // indel location and seq
+        var aln_loc_seq = Array(192)
+        for (var i=0; i<192; i++)
+        {
+            aln_loc_seq[i] = Array(10000);
+            for (var ii=0; ii<10000; ii++)
+            {
+                aln_loc_seq[i][ii] = '';
+            }
+        }
+        //summary track
+        var summary_track = Array(192)
+        for (var i=0; i<192; i++){
+            summary_track[i] = ''
         }
 
         //reverse comp function
@@ -305,6 +295,9 @@
                 {
                     alert("The target site was not found in the reference sequence. Please enter a valid sequence");
                     return;
+                }
+                else{
+                    alert("The sgRNA was reverse, please enter a reverse sequence sgRNA");
                 }
             }
             //breaking point on locus 
@@ -482,7 +475,7 @@
                 }
                 if (sum > maxsum) maxsum = sum;
             }
-            alert(maxsum)
+            //alert(maxsum)
             for (var barcode=0; barcode<192; barcode++)
             {
                 var sum = 0;
@@ -497,40 +490,59 @@
                 var read_ambigous = 0;
 
                 for (var i=0; i<10000; i++){
-                    if (hits[barcode][i]>=1){
-                        sum++
+                    if (hits[barcode][i]>=0){
                         switch (hits[barcode][i]){
                             case 0:
                                 not_align++;
                                 break;
                             case 1:
                                 no_indel++;
+                                sum++
                                 break;
                             case 2:
                                 inf_indel1++;
+                                sum++
                                 break;
                             case 3:
                                 inf_indel2++;
+                                sum++
                                 break;
                             case 4:
                                 inf_indel3++;
+                                sum++
                                 break;
                             case 5: 
                                 out_indel1++;
+                                sum++
                                 break;
                             case 6: 
                                 out_indel2++;
+                                sum++
                                 break;
                             case 7: 
                                 targetingOligo++;
+                                sum++
                                 break;
                             case 8: 
                                 read_ambigous++;
+                                sum++
                                 break;
                         }
                     }
                 }
+                var total_read = not_align +sum
+                summary_track[i] += 'Total read: ' + total_read +" reads\n";
+                summary_track[i] += 'Total targetingOligo: ' + (targetingOligo/total_read)*100 +" % \n";
+                summary_track[i] += 'Total Infram indel' + (inf_indel1 + inf_indel2+ inf_indel3)+ ", "+ (inf_indel1 + inf_indel2+ inf_indel3)/total_read*100+ "\n";
+                summary_track[i] += 'Total Out indel' + (out_indel1, out_indel2)/total_read*100+ "%\n";
+                summary_track[i] += 'Total Out indel' + (out_indel1, out_indel2)/total_read*100+ "%\n";
+                summary_track[i] += 'Total Ambigous' + (read_ambigous)/total_read*100+ "%\n";
+                alert(summary_track[i])
+
                 
+
+
+
                 var size = 24*Math.sqrt(sum/maxsum);
                 var midx = (barcode%12)*50 + 25;
                 var midy = Math.floor(barcode/12) * 65 + 25;
