@@ -478,6 +478,7 @@
                 if (sum > maxsum) maxsum = sum;
             }
             //alert(maxsum)
+            
             for (var barcode=0; barcode<192; barcode++)
             {
                 var sum = 0;
@@ -532,14 +533,16 @@
                         }
                     }
                 }
-                var total_read = not_align +sum
-                summary_track[i] += 'Total read: ' + total_read +" reads\n";
-                summary_track[i] += 'Total targetingOligo: ' + (targetingOligo/total_read)*100 +" % \n";
-                summary_track[i] += 'Total Infram indel' + (inf_indel1 + inf_indel2+ inf_indel3)+ ", "+ (inf_indel1 + inf_indel2+ inf_indel3)/total_read*100+ "\n";
-                summary_track[i] += 'Total Out indel' + (out_indel1, out_indel2)/total_read*100+ "%\n";
-                summary_track[i] += 'Total Out indel' + (out_indel1, out_indel2)/total_read*100+ "%\n";
-                summary_track[i] += 'Total Ambigous' + (read_ambigous)/total_read*100+ "%\n";
-                alert(summary_track[i])
+                var total_read = not_align + sum
+                summary_track[barcode] += 'Total read: ' + total_read +" reads\n";
+                summary_track[barcode] += 'Total targetingOligo: ' + (targetingOligo/total_read)*100 +" % \n";
+                summary_track[barcode] += 'No indel: ' + (no_indel)/total_read*100+ "%\n";
+                summary_track[barcode] += 'Total Infram indel: ' + (inf_indel1 + inf_indel2+ inf_indel3)+ ", "+ (inf_indel1 + inf_indel2+ inf_indel3)/total_read*100+ "%\n";
+                summary_track[barcode] += 'Total Out indel: ' + (out_indel1, out_indel2)/total_read*100+ "%\n";
+                summary_track[barcode] += 'Total Out indel: ' + (out_indel1, out_indel2)/total_read*100+ "%\n";
+                summary_track[barcode] += 'Total Ambigous: ' + (read_ambigous)/total_read*100+ "%\n";
+                summary_track[barcode] += 'Non-aligned: ' + (not_align)/total_read*100+ "%\n";
+                alert(summary_track[barcode])
 
                 
 
