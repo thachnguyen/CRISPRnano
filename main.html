@@ -71,9 +71,10 @@
                 <br>Nuclease Target Site (*): <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="RightBS" value="CATCTTCAATCAACTGGCCG"><br>
                 <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely false discover ratio you can get because of noisy data.&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
                 <br>Targeting mutagenesis oligonucleotide (optional): <a href="javascript:alert(&#39;If a donor oligonucleotide was used to introduce a site specific genomic alteration (e.g. a single nucleotide base exchange), the respective sequence should be entered here. Please note that the sequence entered must be in the same orientation as the amplicon sequence.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="TargetingOligo" value=""><br>
-                <!-- <br>Indel Threshold [%]: <a href="javascript:alert(&#39;The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered (default is 5 %).&#39;)">(?)</a><br><input type="text" size="20" name="MutationThreshold" value="5"><br>-->
                 <!--<br>Phred Score Threshold: <a href="javascript:alert(&#39;A Phred Score Threshold is used to specifically consider the read quality of the two bases surrounding the indel position (one base preceding, one base following the indel position). We recommend a default Phred Score Threshold of 12, yet depending on the sequencing quality adjustments should be considered.&#39;)">(?)</a><br><input type="text" size="20" name="PhredThreshold" value="12"><br>-->
-                <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="GeneName" value="ACE2"><br><br>
+                <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="GeneName" value="ACE2"><br>
+                <br>Indel Threshold [%]: <a href="javascript:alert('The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered (default is 5 %).')">(?)</a><br><input type="text" size="20" class="input_form" name="MutationThreshold" VALUE="5"></input><br>
+
                 <a style="font-style: italic;">
                     CRISPRnano website is free and open to all users and there is no login requirement<br><br></a>
                 <a style="font-style: italic;"> (*) Mandatory field </a>
@@ -278,7 +279,7 @@
             rightbs = document.getElementsByName("RightBS")[0].value.toUpperCase(); // sgRNA seq  
             RightBsLen = rightbs.length;
 
-            //MutationThreshold = document.getElementsByName("MutationThreshold")[0].value;
+            MutationThreshold = document.getElementsByName("MutationThreshold")[0].value;
             //PhredThreshold = document.getElementsByName("PhredThreshold")[0].value*1 + 33;  //Phred quality score
 
             region_analyse = document.getElementsByName("region_analyse")[0].value;
@@ -383,34 +384,34 @@
                 }
                 else{
                     //1st step to check part of sgRNA in the read? use small flunctuate in alignment score
-                    var rst1 = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
+                    //var rst1 = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
 
-                    if (rst1[0]> (RightBsLen-5)){
-                        var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
-                        var str1 = 'file_id ' +id+ ';  read number: ' + readnum +'\n';
-                        str1 += 'score: ' + rst[0] + '\n';
-                        str1 += 'start: ' + rst[1] + '\n';
-                        str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
-                        str1 += 'alignment track:\n';
-                        var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
-                        //alert(fmt1)
-                        var fmt = fmt1[0]
-                        aln_type = fmt1[1]
-                        
-                        str1 += fmt[0] + '\n';
-                        str1 += fmt[1] + '\n';
-                        str1 += fmt[2] + '\n';
-                        str1 += fmt[3] + '\n';
-                        str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
-                        
-                        aln_tracks[id] +=str1
-                        hits[id][readnum] = aln_type
-                        readnum++;
-                    }
-                    else{
-                        hits[id][readnum] = 0
-                        readnum++;
-                    }           
+                    //if (rst1[0]> (RightBsLen-5)){
+                    var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
+                    var str1 = 'file_id ' +id+ ';  read number: ' + readnum +'\n';
+                    str1 += 'score: ' + rst[0] + '\n';
+                    str1 += 'start: ' + rst[1] + '\n';
+                    str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
+                    str1 += 'alignment track:\n';
+                    var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
+                    //alert(fmt1)
+                    var fmt = fmt1[0]
+                    aln_type = fmt1[1]
+                    
+                    str1 += fmt[0] + '\n';
+                    str1 += fmt[1] + '\n';
+                    str1 += fmt[2] + '\n';
+                    str1 += fmt[3] + '\n';
+                    str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
+                    
+                    aln_tracks[id] +=str1
+                    hits[id][readnum] = aln_type
+                    readnum++;
+                    // }
+                    // else{
+                    //     hits[id][readnum] = 0
+                    //     readnum++;
+                    // }           
             }
         }
             RestFromLastChunk = original.substr(cursor);
@@ -534,6 +535,7 @@
                     }
                 }
                 var total_read = not_align + sum
+                summary_track[barcode] += 'SUMMARY: \n';
                 summary_track[barcode] += 'Total read: ' + total_read +" reads\n";
                 summary_track[barcode] += 'Total targetingOligo: ' + (targetingOligo/total_read)*100 +" % \n";
                 summary_track[barcode] += 'No indel: ' + (no_indel)/total_read*100+ "%\n";
@@ -542,12 +544,9 @@
                 summary_track[barcode] += 'Total Out indel: ' + (out_indel1, out_indel2)/total_read*100+ "%\n";
                 summary_track[barcode] += 'Total Ambigous: ' + (read_ambigous)/total_read*100+ "%\n";
                 summary_track[barcode] += 'Non-aligned: ' + (not_align)/total_read*100+ "%\n";
-                alert(summary_track[barcode])
+                //alert(summary_track[barcode])
 
-                
-
-
-
+            
                 var size = 24*Math.sqrt(sum/maxsum);
                 var midx = (barcode%12)*50 + 25;
                 var midy = Math.floor(barcode/12) * 65 + 25;
