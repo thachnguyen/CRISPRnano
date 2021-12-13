@@ -56,8 +56,21 @@
                 </div>
 
                 <br>Reference Sequence (*): <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" class="input_form" size="65" name="Locus" value="ACTGTCCCTCTTTCCCATACACTGCCCCACAACTGTTTGTGTGTACAGTTCCTTGCTTACCTCTTCAAAGGTATGTTCCACATCTTCAATCAACTGGCCGCGGCTGTAGTCATAGCCATCTACCCCATTTACTTCATAGTCTCCTCTCCAATAATCCCCA"><br>
+                
                 <br>Nuclease Target Site (*): <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="RightBS" value="CATCTTCAATCAACTGGCCG"><br>
-                <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely false discover ratio you can get because of noisy data.&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
+                
+                <div class="column">
+                <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely false discover ratio you can get because of noisy data. You can change the central point of interested region to the left or right. Default is double strand breaking point&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
+                   <br> 
+                </div> 
+                <div class="column">
+                    <p>(Advanced) Drag the slider to the left or right to change the interested region</p>
+                <div class="slidecontainer">
+                    <input type="range" min="-30" max="30" value="0" class="slider" id="myRange" oninput="this.nextElementSibling.value = this.value">
+                    <br> <br><br>
+                  </div>
+                </div> 
+
                 <br>Targeting mutagenesis oligonucleotide (optional): <a href="javascript:alert(&#39;If a donor oligonucleotide was used to introduce a site specific genomic alteration (e.g. a single nucleotide base exchange), the respective sequence should be entered here. Please note that the sequence entered must be in the same orientation as the amplicon sequence.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="TargetingOligo" value=""><br>
                 <!--<br>Phred Score Threshold: <a href="javascript:alert(&#39;A Phred Score Threshold is used to specifically consider the read quality of the two bases surrounding the indel position (one base preceding, one base following the indel position). We recommend a default Phred Score Threshold of 12, yet depending on the sequencing quality adjustments should be considered.&#39;)">(?)</a><br><input type="text" size="20" name="PhredThreshold" value="12"><br>-->
                 <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="GeneName" value="ACE2"><br>
