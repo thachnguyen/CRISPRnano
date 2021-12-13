@@ -46,27 +46,15 @@
             <div id="setup" style="position:absolute; left:20px; top:80px">
                 <br>
                 <br>
-                <!-- <div style="width: 50%;"> 
-                    FASTQ Files: 
-                    <div class="help">
-                        <div class="question">?</div>
-                        <div class="popup">
-                            <p>input files your CRISPR experiment data, make sure that the correct ordering is applied in the file browser. The file allocation to individual pie charts can be verified by the numbers given below the output pie charts
-                            </p>
-                        </div>
-                    </div>
-                </div> -->
                 <div class="column">
                 FASTQ Files (*): <a href="javascript:alert(&#39; Your input files your CRISPR experiment data, make sure that the correct ordering is applied in the file browser. We recommend file's size smaller than 200 MB. The file allocation to individual pie charts can be verified by the numbers given below the output pie charts.&#39;)">(?)</a> 
                     <br><input type="file" id="files" class="input_form" name="files[]" multiple=""><br><br>
-    
                 </div>
                 <div class="column">
                     Barcode Files (optional): <a href="javascript:alert(&#39; Your input barcode files your CRISPR experiment data, make sure that the correct ordering of barcode. The file must be in fasta format by the numbers given below the output pie charts.&#39;)">(?)</a> 
                     <br><input type="file" id="barcode_files" class="input_form" name="files[]" multiple=""> <br><br>
                 </div>
 
-                
                 <br>Reference Sequence (*): <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" class="input_form" size="65" name="Locus" value="ACTGTCCCTCTTTCCCATACACTGCCCCACAACTGTTTGTGTGTACAGTTCCTTGCTTACCTCTTCAAAGGTATGTTCCACATCTTCAATCAACTGGCCGCGGCTGTAGTCATAGCCATCTACCCCATTTACTTCATAGTCTCCTCTCCAATAATCCCCA"><br>
                 <br>Nuclease Target Site (*): <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="RightBS" value="CATCTTCAATCAACTGGCCG"><br>
                 <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely false discover ratio you can get because of noisy data.&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
@@ -305,6 +293,7 @@
             }
             //breaking point on locus 
             BreakPoint = RightBsPos + RightBsLen
+            // Test keap1: BreakPoint == 283
         
             var evt = document.getElementById('files');
             files = evt.files;

@@ -260,6 +260,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                     ot += target.substr(lt, len);
                     oq1 += Array(len).fill('\xa0').join('');
                     oq += Array(len+1).join("-");
+                    lt += len;
                 } 
                 
                 if (len%3 == 0){
@@ -358,6 +359,9 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
 	for (var k = 0; k < ut.length; ++k)
 		mid += ut.charAt(k) == uq.charAt(k)? '|' : ' ';
 	//return [[ot, mid, oq, oq1], aln_type];
+    alert(ut)
+    alert(uq)
+    alert(mid)
     return [[ot.substr(bkp11-20, bkp22-bkp11+40), mid.substr(bkp11-20, bkp22-bkp11+40),oq.substr(bkp11-20, bkp22-bkp11+40), oq1.substr(bkp11-20, bkp22-bkp11+40), oq.substr(bkp11, bkp22-bkp11), oq1.substr(bkp11, bkp22-bkp11)], aln_type];
 }
 
