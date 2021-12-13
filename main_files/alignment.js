@@ -363,6 +363,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
     // alert(uq)
     // alert(mid)
     return [[ot.substr(bkp1-20-start, bkp2-bkp1+40), mid.substr(bkp1-20-start, bkp2-bkp1+40),oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40), oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40)], aln_type];
+    //return [[ot, mid,oq, oq1, oq, oq1], aln_type];
 }
 
 function bsa_cigar2str(cigar)

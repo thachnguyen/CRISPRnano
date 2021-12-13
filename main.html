@@ -67,6 +67,7 @@
                     <p>(Advanced) Drag the slider to the left or right to change the interested region</p>
                 <div class="slidecontainer">
                     <input type="range" min="-30" max="30" value="0" class="slider" id="myRange" oninput="this.nextElementSibling.value = this.value">
+                    <p>Value: <span id="demo"></span></p>
                     <br> <br><br>
                   </div>
                 </div> 
@@ -157,6 +158,14 @@
             </div>
               </div>
     <script>
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("demo");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function() {
+        output.innerHTML = this.value;
+        }
+
         //Top Menu:
         var SVGtab = new Array(10), SVGtabtext = new Array(10);
         var tabtextcontent = ["Crispr Analyzer", "Results", "Track", "About CRISPRNano"];
