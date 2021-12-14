@@ -60,14 +60,14 @@
                 <br>Nuclease Target Site (*): <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="RightBS" value="CATCTTCAATCAACTGGCCG"><br>
                 
                 <div class="column">
-                <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely false discover ratio you can get because of noisy data. You can change the central point of interested region to the left or right. Default is double strand breaking point&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
+                <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely higher false discover rate you can get because of noisy data. You can change the central point of interested region to the left or right. Default is double strand breaking point&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
                    <br> 
                 </div> 
                 <div class="column">
                     <p>(Advanced) Drag the slider to the left or right to change the interested region</p>
                 <div class="slidecontainer">
                     <input type="range" min="-30" max="30" value="0" class="slider" id="myRange" oninput="this.nextElementSibling.value = this.value">
-                    <p>Value: <span id="demo"></span></p>
+                    <p>Offset w.r.t DSP: <span id="demo"></span> <a href="javascript:alert(&#39;You can shift the centre of interest region with respect to the double strand breakpoint (DSB) to the left or right. Default value is double strand breaking point 0&#39;)">(?)</a></p>
                     <br> <br><br>
                   </div>
                 </div> 
@@ -383,8 +383,7 @@
                     var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
                     //alert(fmt1)
                     var fmt = fmt1[0]
-                    aln_type = 7
-                    
+                                  
                     str1 += fmt[0] + '\n';
                     str1 += fmt[1] + '\n';
                     str1 += fmt[2] + '\n';

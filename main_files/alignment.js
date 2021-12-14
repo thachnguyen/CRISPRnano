@@ -208,7 +208,7 @@ function bsa_cigar2gaps(target, query, start, cigar)
 	return [ot, oq, mid];
 }
 
-// generate cigar to gap in breakpoint windows
+// generate cigar to gap in breakpoint windows, bkp11, bkp22 is offset interest region of ref wrt gap add-in ref 
 function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
 {
 	var oq = '', ot = '', mid = '', oq1 = '', lq = 0, lt = start;
@@ -219,7 +219,11 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
         var op = cigar[k]&0xf, len = cigar[k]>>4;
         var len1 = Math.floor(len/3)
         //update breakpoints only, no update aln_type
-        if (lt + len <= bkp11){
+        if (start > bkp11){
+            aln_type=0;
+            continue;
+        } 
+        else if (lt + len <= bkp11){
             if (op == 0) { // match
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
@@ -248,7 +252,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 oq1 += Array(len).fill('\xa0').join('');
                 lq += len, lt += len;
                 if (aln_type==0){
-                    aln_type = 1
+                    aln_type = 1;
                 }
             } else if ((op == 1)||(op == 2)) { // Combine indels
                 // ot += Array(len+1).join("-");
@@ -264,6 +268,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 } 
                 
                 if (len%3 == 0){
+                    //check previous state
                     if ((aln_type==0)||(aln_type==1)){
                         switch (len1%3){
                             case 0:
@@ -278,6 +283,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                         }
                     }
                     else {
+                        // if aln_type already indel so it 's ambigious
                         aln_type = 8  // ambigous
                     }     
                 }
@@ -301,7 +307,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 lq += len;
             }
         }
-        else {   // bk point cover all windows
+        else {   // bk point cover single windows
             if (op == 0) { // match
                 oq += query.substr(lq, len);
                 ot += target.substr(lt, len);
@@ -362,8 +368,8 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
     // alert(ut)
     // alert(uq)
     // alert(mid)
-    return [[ot.substr(bkp1-20-start, bkp2-bkp1+40), mid.substr(bkp1-20-start, bkp2-bkp1+40),oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40), oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40)], aln_type];
-    //return [[ot, mid,oq, oq1, oq, oq1], aln_type];
+    //return [[ot.substr(bkp1-20-start, bkp2-bkp1+40), mid.substr(bkp1-20-start, bkp2-bkp1+40),oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40), oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40)], aln_type];
+    return [[ot, mid,oq, oq1, oq, oq1], aln_type];
 }
 
 function bsa_cigar2str(cigar)
