@@ -1,6 +1,6 @@
 // Alignment algorithms
 // modified version of Smith Watermann algorithm 
-// the JS API from implementation by Prof Heng Li at https://github.com/lh3/bioseq-js
+// This program use some JS API from implementation by Prof Heng Li at https://github.com/lh3/bioseq-js
 /**
  * Encode a sequence string with table
  * @param seq    sequence
@@ -219,6 +219,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
         var op = cigar[k]&0xf, len = cigar[k]>>4;
         var len1 = Math.floor(len/3)
         //update breakpoints only, no update aln_type
+        // first check the alignment start point position
         if (start > bkp11){
             aln_type=0;
             continue;
@@ -368,8 +369,8 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
     // alert(ut)
     // alert(uq)
     // alert(mid)
-    //return [[ot.substr(bkp1-20-start, bkp2-bkp1+40), mid.substr(bkp1-20-start, bkp2-bkp1+40),oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40), oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40)], aln_type];
-    return [[ot, mid,oq, oq1, oq, oq1], aln_type];
+    return [[oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40)], aln_type];
+    //return [[ot, mid,oq, oq1], aln_type];
 }
 
 function bsa_cigar2str(cigar)
