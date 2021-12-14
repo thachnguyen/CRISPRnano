@@ -228,9 +228,11 @@
         
         var RightBsPos=0, RightBsLen=0;
         var hits = Array(192);
+        var indel_pos = Array(192);
         for (var i=0; i<192; i++)
         {
             hits[i] = Array(10000);
+            indel_pos[i]
             for (var ii=0; ii<10000; ii++)
             {
                 hits[i][ii] = -1;
@@ -376,19 +378,19 @@
                     aln_type = 7;
                     hits[id][readnum] = aln_type
                     var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
-                    var str1 = 'file_id ' +id+ ';  read number: ' + readnum +'\n';
-                    str1 += 'score: ' + rst[0] + '\n';
-                    str1 += 'start: ' + rst[1] + '\n';
-                    str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
+                    var str1 = ''
+                    //var str1 = 'file_id ' +id+ ';  read number: ' + readnum +'\n';
+                    // str1 += 'score: ' + rst[0] + '\n';
+                    // str1 += 'start: ' + rst[1] + '\n';
+                    // str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
                     str1 += 'alignment track:\n';
                     var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
-                    //alert(fmt1)
                     var fmt = fmt1[0]
                                   
                     str1 += fmt[0] + '\n';
                     str1 += fmt[1] + '\n';
-                    str1 += fmt[2] + '\n';
-                    str1 += fmt[3] + '\n';
+                    // str1 += fmt[2] + '\n';
+                    // str1 += fmt[3] + '\n';
                     str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
                     aln_tracks[id] +=str1
                     readnum++;
@@ -396,9 +398,10 @@
                 else{
                     var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
                     var str1 = 'file_id ' +id+ ';  read number: ' + readnum +'\n';
-                    str1 += 'score: ' + rst[0] + '\n';
-                    str1 += 'start: ' + rst[1] + '\n';
-                    str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
+                    var str1 = ''
+                    // str1 += 'score: ' + rst[0] + '\n';
+                    // str1 += 'start: ' + rst[1] + '\n';
+                    // str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
                     str1 += 'alignment track:\n';
                     var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
                     var fmt = fmt1[0]
@@ -406,8 +409,8 @@
                     
                     str1 += fmt[0] + '\n';
                     str1 += fmt[1] + '\n';
-                    str1 += fmt[2] + '\n';
-                    str1 += fmt[3] + '\n';
+                    // str1 += fmt[2] + '\n';
+                    // str1 += fmt[3] + '\n';
                     str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
                     
                     aln_tracks[id] +=str1
