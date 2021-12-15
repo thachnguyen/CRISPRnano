@@ -903,12 +903,20 @@
             SVGObj.setAttribute("x", 40);
             SVGObj.setAttribute("y", ysize+delypos);
             SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent = "Gene: "+document.getElementsByName("GeneName")[0].value+"   |   File "+GetWellPos(barcode)+": "+files[barcode].name+"   |   Total aligned reads: " + sum_track[barcode];
+            SVGObj.textContent = "Gene: "+document.getElementsByName("GeneName")[0].value+"   |   File "+GetWellPos(barcode)+": "+files[barcode].name;
             svg.appendChild(SVGObj);
-            delypos+=delyshift;
-            var xfrom = BreakPoint-region_analyse*1 -30;
-            var xto = BreakPoint+region_analyse*1+20;
 
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("x", 40);
+            SVGObj.setAttribute("y", ysize+delypos+30);
+            SVGObj.setAttribute("font-size", "14");
+            SVGObj.textContent = "Total aligned reads: " + sum_track[barcode] +"   |  ";
+            svg.appendChild(SVGObj);
+
+
+            delypos+=delyshift;
+            var xfrom = BreakPoint-region_analyse*1;
+            var xto = BreakPoint+region_analyse*1;
             //wt:
             for (var x=xfrom; x<xto; x++)
             {
@@ -925,6 +933,20 @@
                 svg.appendChild(SVGObj);
             }
             //reference:
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("x", 10);
+            SVGObj.setAttribute("y", ysize+delypos);
+            SVGObj.setAttribute("font-size", "14");
+            SVGObj.textContent += "REFERENCE";
+            svg.appendChild(SVGObj);
+            //line:
+            var SVGObj= document.createElementNS(NS,"path");
+            SVGObj.setAttributeNS(null, "d", "M 10,"+(ysize+delypos+5.5)+" L 1073,"+(ysize+delypos+5.5));
+            SVGObj.style.stroke="rgb(0,0,0)";
+            SVGObj.setAttributeNS(null, "stroke-width", 1);
+            svg.appendChild(SVGObj);
+            delypos+=delyshift;
+
             var SVGObj= document.createElementNS(NS,"text");
             SVGObj.setAttribute("x", 10);
             SVGObj.setAttribute("y", ysize+delypos);
