@@ -228,17 +228,18 @@
         
         var RightBsPos=0, RightBsLen=0;
         var hits = Array(192);
+        aln_dict = Array(192);
         var indel_pos = Array(192);
         for (var i=0; i<192; i++)
         {
             hits[i] = Array(10000);
-            indel_pos[i]
+            aln_dict[i] = {}
             for (var ii=0; ii<10000; ii++)
             {
                 hits[i][ii] = -1;
             }
         }
-
+    
         var AlignmentPrecalc = new Array(192);
  
         var locus, locuslen;
@@ -402,17 +403,26 @@
                     // str1 += 'score: ' + rst[0] + '\n';
                     // str1 += 'start: ' + rst[1] + '\n';
                     // str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
-                    str1 += 'alignment track:\n';
+                    //str1 += 'alignment track:\n';
                     var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
                     var fmt = fmt1[0]
                     aln_type = fmt1[1]
-                    
+
                     str1 += fmt[0] + '\n';
                     str1 += fmt[1] + '\n';
+
+                    //aggregate aln track into dictionary
+                    if (aln_type !=0){ 
+                        if (aln_dict[id].hasOwnProperty(str1)){
+                            aln_dict[id][str1]+=1
+                        }
+                        else {
+                            aln_dict[id][str1] = 1
+                        }
+                    }
                     // str1 += fmt[2] + '\n';
                     // str1 += fmt[3] + '\n';
-                    str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
-                    
+                    //str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
                     aln_tracks[id] +=str1
                     hits[id][readnum] = aln_type
                     readnum++;       
@@ -440,7 +450,8 @@
             }
             else
             {
-                document.getElementById('out').value = aln_tracks[0]
+                // document.getElementById('out').value = aln_tracks[0]
+                document.getElementById('out').value = JSON.stringify(aln_dict[0])
                 DrawPie();
             }
         }
@@ -843,10 +854,13 @@
             return ABC[Math.floor(i/16)] + ((i%16)+1);
         }
 
+
+
         //Alignment summary plot:
         function PlotAlignment(barcode, hits, align_track, locus)
         {
-          //Find top 3:
+            //aggregate aln_track
+            //Find top 3:
             var ysize = 30;
             var max=0;
             var svg = document.getElementById("SVGmut");

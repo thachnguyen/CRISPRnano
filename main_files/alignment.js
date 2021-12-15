@@ -365,11 +365,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
 	var uq = oq.toUpperCase();
 	for (var k = 0; k < ut.length; ++k)
 		mid += ut.charAt(k) == uq.charAt(k)? '|' : ' ';
-	//return [[ot, mid, oq, oq1], aln_type];
-    // alert(ut)
-    // alert(uq)
-    // alert(mid)
-    return [[oq.substr(bkp1-20-start, bkp2-bkp1+40), oq1.substr(bkp1-20-start, bkp2-bkp1+40)], aln_type];
+    return [[oq.substr(bkp1-start, bkp2-bkp1), oq1.substr(bkp1-start, bkp2-bkp1)], aln_type];
     //return [[ot, mid,oq, oq1], aln_type];
 }
 
