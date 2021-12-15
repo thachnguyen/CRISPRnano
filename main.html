@@ -60,7 +60,7 @@
                 <br>Nuclease Target Site (*): <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="RightBS" value="CCGTGGGAGCCGCCGACGG"><br>
                 
                 <div class="column">
-                <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely higher false discover rate you can get because of noisy data. You can change the central point of interested region to the left or right. Default is double strand breaking point&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="10" class="input_form" ><br>
+                <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely higher false discover rate you can get because of noisy data. You can change the central point of interested region to the left or right. Default is double strand breaking point&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="20" class="input_form" ><br>
                    <br> 
                 </div> 
                 <div class="column">
@@ -416,7 +416,6 @@
 
                     str1 += fmt[0] + '\n';
                     str1 += fmt[1] + '\n';
-
                     //aggregate aln track into dictionary
                     if (aln_type !=0){ 
                         if (aln_dict[id].hasOwnProperty(str1)){
@@ -889,7 +888,6 @@
             var svg = document.getElementById("SVGmut");
             var NS="http://www.w3.org/2000/svg";
             var strokew = "0.5";
-
             //Clear:
             while (svg.lastChild)
             {
@@ -912,20 +910,18 @@
             SVGObj.setAttribute("font-size", "14");
             SVGObj.textContent = "Total aligned reads: " + sum_track[barcode] +"   |  ";
             svg.appendChild(SVGObj);
-
-
             delypos+=delyshift;
+
             var xfrom = BreakPoint-region_analyse*1;
             var xto = BreakPoint+region_analyse*1;
             //wt:
-            for (var x=xfrom; x<xto; x++)
-            {
+            for (var x=xfrom; x<xto; x++){
                 //draw base:
                 var SVGObj= document.createElementNS(NS,"text");
                 SVGObj.setAttribute("x", 120+12*(x-xfrom)+2);
-                SVGObj.setAttribute("y", ysize+delypos);
+                SVGObj.setAttribute("y", ysize+delypos+20);
                 SVGObj.setAttribute("font-size", "14");
-                if (x>=RightBsPos && x<RightBsPos+RightBsLen) SVGObj.setAttribute("fill", "rgb(0,0,200)");
+                if (x>=RightBsPos && x<RightBsPos+RightBsLen) SVGObj.setAttribute("fill", "rgb(0,0,250)");
                 else SVGObj.setAttribute("fill", "rgb(0,0,0)");
                 SVGObj.textContent = locus[x];
                 SVGObj.setAttribute("x", 120+12*(x-xfrom));
@@ -935,7 +931,7 @@
             //reference:
             var SVGObj= document.createElementNS(NS,"text");
             SVGObj.setAttribute("x", 10);
-            SVGObj.setAttribute("y", ysize+delypos);
+            SVGObj.setAttribute("y", ysize+delypos+20);
             SVGObj.setAttribute("font-size", "14");
             SVGObj.textContent += "REFERENCE";
             svg.appendChild(SVGObj);
@@ -946,20 +942,34 @@
             SVGObj.setAttributeNS(null, "stroke-width", 1);
             svg.appendChild(SVGObj);
             delypos+=delyshift;
-
+            var id1 = 0
+            for (let key in aln_dict_fil[barcode]){
+                for (var x=0; x<region_analyse*2; x++){
+                    //draw base:
+                    var SVGObj= document.createElementNS(NS,"text");
+                    SVGObj.setAttribute("x", 120+12*(x-xfrom));
+                    SVGObj.setAttribute("y", ysize+delypos+20);
+                    SVGObj.setAttribute("font-size", "14");
+                    SVGObj.setAttribute("fill", "rgb(0,0,0)");
+                    SVGObj.textContent = key[x];
+                    SVGObj.setAttribute("x", 120+12*(x-xfrom));
+                    SVGObj.setAttribute("text-anchor", "middle");
+                    svg.appendChild(SVGObj);
+                }
+            }
             var SVGObj= document.createElementNS(NS,"text");
             SVGObj.setAttribute("x", 10);
             SVGObj.setAttribute("y", ysize+delypos);
             SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent += "REFERENCE";
+            SVGObj.textContent += "CALL 1";
             svg.appendChild(SVGObj);
-            //line:
-            var SVGObj= document.createElementNS(NS,"path");
-            SVGObj.setAttributeNS(null, "d", "M 10,"+(ysize+delypos+5.5)+" L 1073,"+(ysize+delypos+5.5));
-            SVGObj.style.stroke="rgb(0,0,0)";
-            SVGObj.setAttributeNS(null, "stroke-width", 1);
-            svg.appendChild(SVGObj);
-            delypos+=delyshift;
+            // //line:
+            // var SVGObj= document.createElementNS(NS,"path");
+            // SVGObj.setAttributeNS(null, "d", "M 10,"+(ysize+delypos+5.5)+" L 1073,"+(ysize+delypos+5.5));
+            // SVGObj.style.stroke="rgb(0,0,0)";
+            // SVGObj.setAttributeNS(null, "stroke-width", 1);
+            // svg.appendChild(SVGObj);
+            // delypos+=delyshift;
 
             // //Del seq:
             // var indelnr=0;
