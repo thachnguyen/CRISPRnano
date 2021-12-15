@@ -217,7 +217,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
     var aln_type = 0;
     for (var k = 0; k < cigar.length; ++k) {
         var op = cigar[k]&0xf, len = cigar[k]>>4;
-        var len1 = Math.floor(len/3)
+        //var len1 = Math.floor(len/3)
         //update breakpoints only, no update aln_type
         // first check the alignment start point position
         if (start > bkp11){
@@ -271,17 +271,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 if (len%3 == 0){
                     //check previous state
                     if ((aln_type==0)||(aln_type==1)){
-                        switch (len1%3){
-                            case 0:
-                                aln_type =2;
-                                break;
-                            case 1:
-                                aln_type =3;
-                                break;
-                            case 2: 
-                                aln_type = 4;
-                                break;
-                        }
+                        aln_type =2;
                     }
                     else {
                         // if aln_type already indel so it 's ambigious
@@ -290,14 +280,7 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                 }
                 else{
                     if ((aln_type==0)||(aln_type==1)){
-                        switch (len%3){
-                            case 1:
-                                aln_type =5;
-                                break;
-                            case 2:
-                                aln_type = 6;
-                                break;
-                        }
+                        aln_type =3;
                     }
                     else {
                         aln_type = 8  // ambigous
@@ -326,39 +309,21 @@ function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
                     oq1 += Array(len).fill('\xa0').join('');
                     oq += Array(len+1).join("-");
                 }  
-
                 lq += len;
                 if (len%3 == 0){
                     if (aln_type==0){
-                        switch (len1%3){
-                            case 0:
-                                aln_type =2;
-                                break;
-                            case 1:
-                                aln_type =3;
-                                break;
-                            case 2: 
-                                aln_type = 4;
-                                break;
+                        aln_type =2;
                         }
-                    }
-                    }
-                else{
+                } else{
                     if (aln_type==0){
-                        switch (len%3){
-                            case 1:
-                                aln_type =5;
-                                break;
-                            case 2:
-                                aln_type = 6;
-                                break;
-                        }
+                        aln_type =3;
                     }
                 }
+                
             } 
             else if (op == 4) { // soft clip
                 lq += len;
-        }
+            }
         }    
     }
 	var ut = ot.toUpperCase();

@@ -94,12 +94,12 @@
                 <b>About:</b>
                 <br>
                 <br>CRISPRNano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones. Crispnano supports noisy Oxford Nanopore, Illumina as well as other sequencing data.  
-                CRISPRNano was developed by Thach Nguyen in the group of Andrea Rossi, Leibniz Research Institute for Environmental Medicine.
-                The template, data input, output are developped base on the template of Outknocker http://www.outknocker.org/. 
+                CRISPRNano was developed by Dr. Thach Nguyen in the group of Dr. Andrea Rossi, Leibniz Research Institute for Environmental Medicine.
+                The template web interface, data input, output are developped base on the template of Outknocker http://www.outknocker.org/. 
                 <br>
                 <br><b>Contact:</b>
                 <br>
-                <br>Thach Nguyen
+                <br>Dr. Thach Nguyen
                 <br>IUF Institute for Environmental Medicine
                 <br>thach.nguyen@iuf-duesseldorf.de
                 <br>
@@ -233,7 +233,6 @@
         //filtered aligned dictionary
         aln_dict_fil = Array(192)
         aln_type_dict = Array(192)
-        var indel_pos = Array(192);
         for (var i=0; i<192; i++)
         {
             hits[i] = Array(10000);
@@ -479,7 +478,6 @@
             reader = new FileReader();
             reader.onload = FileReceived;
             reader.readAsText(files[CurrentFileId].slice(CurrentFileChunk*chunksize, (CurrentFileChunk+1)*chunksize));
-
             //progress display:
             // document.getElementById('progress').innerHTML = "File "+(CurrentFileId+1)+": "+Math.round(CurrentFileChunk*chunksize/1000000)+" MB processed";
             document.getElementById('progress').innerHTML = "File "+(CurrentFileId+1)+":"+" processing. Please keep your web browser open"
@@ -498,7 +496,7 @@
             //register mouse listener:
             svg.addEventListener("mousedown", PieClick, false);
 
-            var ROT= ["rgb(232,0,30)","rgb(252,176,78)"]; 
+            var ROT= ["rgb(232,0,30)","rgb(255,102,0)","rgb(252,176,78)"]; 
             var BLAU=["rgb(50,42,126)","rgb(16,115,179)","rgb(38,170,220)"];
 
             var maxsum = 0;
@@ -513,14 +511,34 @@
                 var sum = 0;
                 var not_align = 0;
                 var no_indel = 0; 
-                var inf_indel1 = 0;
-                var inf_indel2 = 0;
-                var inf_indel3 = 0;
-                var out_indel1 = 0;
-                var out_indel2 = 0;
+                var inf_indel =  0;
+                var inf_indel1 =  Array(3)
+                var out_indel = 0;
+                var out_indel1 = Array(3)
+                for (let i=0; i <3; i++){
+                    inf_indel1[i] = 0;
+                    out_indel1[i] = 0;
+                }
                 var targetingOligo = 0;
                 var read_ambigous = 0;
 
+                // classify indel into several subset
+                for (let key in aln_dict_fil[barcode]){
+                    if (aln_type_dict[barcode][key] == 2){
+                        for (let i=0; i <3; i++){
+                            if (inf_indel1[i]==0){
+                                inf_indel1[i]=aln_dict_fil[barcode][key];
+                            }
+                        }
+                    } else if (aln_type_dict[barcode][key] == 3){
+                        for (let i=0; i <3; i++){
+                            if (out_indel1[i]==0){
+                                out_indel1[i]=aln_dict_fil[barcode][key];
+                                break;
+                            }
+                        }
+                    }
+                }
                 for (var i=0; i<10000; i++){
                     if (hits[barcode][i]>=0){
                         switch (hits[barcode][i]){
@@ -532,23 +550,11 @@
                                 sum++
                                 break;
                             case 2:
-                                inf_indel1++;
+                                inf_indel++;
                                 sum++
                                 break;
-                            case 3:
-                                inf_indel2++;
-                                sum++
-                                break;
-                            case 4:
-                                inf_indel3++;
-                                sum++
-                                break;
-                            case 5: 
-                                out_indel1++;
-                                sum++
-                                break;
-                            case 6: 
-                                out_indel2++;
+                            case 3: 
+                                out_indel++;
                                 sum++
                                 break;
                             case 7: 
@@ -564,22 +570,15 @@
                 }
                 var total_read = not_align + sum
                 summary_track[barcode] = Array(7)
-                // summary_track[barcode] += 'SUMMARY of sample: \n';
-                // summary_track[barcode] += 'Total read: ' + total_read +" reads\n";
-                // summary_track[barcode] += 'Total targetingOligo: '+targetingOligo+' reads, ' + ((targetingOligo/total_read)*100).toFixed(2) +" % \n";
-                // summary_track[barcode] += 'No indel: ' +no_indel +' reads, ' + (no_indel/total_read*100).toFixed(2)+ "%\n";
-                // summary_track[barcode] += 'Total Inframe indel: ' + (inf_indel1 + inf_indel2+ inf_indel3) +' reads, ' + ((inf_indel1 + inf_indel2+ inf_indel3)/total_read*100).toFixed(2)+ "%\n";
-                // summary_track[barcode] += 'Total Outframe indel: '+(out_indel1+ out_indel2) +' reads, '  + ((out_indel1+ out_indel2)/total_read*100).toFixed(2)+ "%\n";
-                // summary_track[barcode] += 'Total Ambigous: ' +read_ambigous +' reads, ' + (read_ambigous/total_read*100).toFixed(2)+ "%\n";
-                // summary_track[barcode] += 'Not aligned or low quality: '+not_align +' reads, ' + (not_align/total_read*100).toFixed(2)+ "%\n";
-                
+                summary_track[barcode] += 'SUMMARY of sample: \n';
+                summary_track[barcode] += 'Total read: ' + total_read +" reads\n";
+                summary_track[barcode] += 'Total targetingOligo: '+targetingOligo+' reads, ' + ((targetingOligo/total_read)*100).toFixed(2) +" % \n";
+                summary_track[barcode] += 'No indel: ' +no_indel +' reads, ' + (no_indel/total_read*100).toFixed(2)+ "%\n";
+                summary_track[barcode] += 'Total Inframe indel: ' + (inf_indel) +' reads, ' + (inf_indel/total_read*100).toFixed(2)+ "%\n";
+                summary_track[barcode] += 'Total Outframe indel: '+out_indel +' reads, '  + (out_indel/total_read*100).toFixed(2)+ "%\n";
+                summary_track[barcode] += 'Total Ambigous: ' +read_ambigous +' reads, ' + (read_ambigous/total_read*100).toFixed(2)+ "%\n";
+                summary_track[barcode] += 'Not aligned or low quality: '+not_align +' reads, ' + (not_align/total_read*100).toFixed(2)+ "%\n";
                 summary_track[barcode][0] = total_read;
-                // summary_track[barcode] = 'Total targetingOligo: '+targetingOligo+' reads, ' + ((targetingOligo/total_read)*100).toFixed(2) +" % \n";
-                // summary_track[barcode] = 'No indel: ' +no_indel +' reads, ' + (no_indel/total_read*100).toFixed(2)+ "%\n";
-                // summary_track[barcode] = 'Total Inframe indel: ' + (inf_indel1 + inf_indel2+ inf_indel3) +' reads, ' + ((inf_indel1 + inf_indel2+ inf_indel3)/total_read*100).toFixed(2)+ "%\n";
-                // summary_track[barcode] = 'Total Outframe indel: '+(out_indel1+ out_indel2) +' reads, '  + ((out_indel1+ out_indel2)/total_read*100).toFixed(2)+ "%\n";
-                // summary_track[barcode] = 'Total Ambigous: ' +read_ambigous +' reads, ' + (read_ambigous/total_read*100).toFixed(2)+ "%\n";
-                // summary_track[barcode] = 'Not aligned or low quality: '+not_align +' reads, ' + (not_align/total_read*100).toFixed(2)+ "%\n";
                 var size = 24*Math.sqrt(sum/maxsum);
                 var midx = (barcode%12)*50 + 25;
                 var midy = Math.floor(barcode/12) * 65 + 25;
@@ -606,7 +605,7 @@
 
                     // inframe indel1
                     var lastangle = angle;
-                    angle+=2*3.1415*0.995*inf_indel1/sum;
+                    angle+=2*3.1415*0.995*inf_indel1[0]/sum;
 
                     var startx = size*Math.cos(lastangle);
                     var starty = size*Math.sin(lastangle);
@@ -622,7 +621,7 @@
 
                     // inframe indel2
                     var lastangle = angle;
-                    angle+=2*3.1415*0.995*inf_indel2/sum;
+                    angle+=2*3.1415*0.995*inf_indel1[1]/sum;
 
                     var startx = size*Math.cos(lastangle);
                     var starty = size*Math.sin(lastangle);
@@ -639,7 +638,7 @@
 
                     // inframe indel3
                     var lastangle = angle;
-                    angle+=2*3.1415*0.995*inf_indel3/sum;
+                    angle+=2*3.1415*0.995*inf_indel1[2]/sum;
 
                     var startx = size*Math.cos(lastangle);
                     var starty = size*Math.sin(lastangle);
@@ -650,13 +649,12 @@
                     var SVGObj= document.createElementNS(NS,"path");
                     SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
                     SVGObj.style.fill="rgb(38,170,220)";
-
                     SVGObj.setAttribute("pointer-events","none");
                     svg.appendChild(SVGObj);
                     
                     // outframe indel1
                     var lastangle = angle;
-                    angle+=2*3.1415*0.995*out_indel1/sum;
+                    angle+=2*3.1415*0.995*out_indel1[0]/sum;
 
                     var startx = size*Math.cos(lastangle);
                     var starty = size*Math.sin(lastangle);
@@ -672,7 +670,23 @@
 
                     // outframe indel2
                     var lastangle = angle;
-                    angle+=2*3.1415*0.995*out_indel2/sum;
+                    angle+=2*3.1415*0.995*out_indel1[1]/sum;
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(252,176,78)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // outframe indel3
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_indel1[2]/sum;
 
                     var startx = size*Math.cos(lastangle);
                     var starty = size*Math.sin(lastangle);
@@ -772,7 +786,7 @@
                 SVGObj.setAttribute("height", "11");
                 SVGObj.style.fill="none";
                 if (i<3) SVGObj.style.fill=BLAU[i];
-                if (i>=4 && i<6) SVGObj.style.fill=ROT[i-4];
+                if (i>=4 && i<7) SVGObj.style.fill=ROT[i-4];
                 if (i==7) SVGObj.style.fill="rgb(200,200,200)";
                 if (i==8) SVGObj.style.fill="rgb(0,200,0)";
                 if (i==9) SVGObj.style.fill="rgb(70,70,70)";
@@ -831,7 +845,7 @@
             SVGObj.setAttribute("x", midx+40);
             SVGObj.setAttribute("y", midy+80+180);
             SVGObj.setAttribute("font-size", "12");
-            SVGObj.textContent = "failed alignment";
+            SVGObj.textContent = "below threshold";
             svg.appendChild(SVGObj);
 
             document.title = "Result for "+document.getElementsByName("GeneName")[0].value+" ("+files.length+" barcodes read)";
