@@ -228,12 +228,18 @@
         
         var RightBsPos=0, RightBsLen=0;
         var hits = Array(192);
+        //raw aligned dictionary
         aln_dict = Array(192);
+        //filtered aligned dictionary
+        aln_dict_fil = Array(192)
+        aln_type_dict = Array(192)
         var indel_pos = Array(192);
         for (var i=0; i<192; i++)
         {
             hits[i] = Array(10000);
             aln_dict[i] = {}
+            aln_dict_fil[i] = {}
+            aln_type_dict[i] = {}
             for (var ii=0; ii<10000; ii++)
             {
                 hits[i][ii] = -1;
@@ -267,9 +273,10 @@
             }
         }
         //summary track
+        var sum_track = Array(192)
         var summary_track = Array(192)
         for (var i=0; i<192; i++){
-            summary_track[i] = ''
+            sum_track[i] = 0
         }
 
         //reverse comp function
@@ -392,7 +399,7 @@
                     str1 += fmt[1] + '\n';
                     // str1 += fmt[2] + '\n';
                     // str1 += fmt[3] + '\n';
-                    str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
+                    //str1 += 'aligment type: '+ aln_type +'  ' +aln_type_str[aln_type]+ '\n\n';
                     aln_tracks[id] +=str1
                     readnum++;
                 }
@@ -418,6 +425,7 @@
                         }
                         else {
                             aln_dict[id][str1] = 1
+                            aln_type_dict[id][str1] = aln_type
                         }
                     }
                     // str1 += fmt[2] + '\n';
@@ -426,8 +434,8 @@
                     aln_tracks[id] +=str1
                     hits[id][readnum] = aln_type
                     readnum++;       
+                }
             }
-        }
             RestFromLastChunk = original.substr(cursor);
             
             //lines = "";
@@ -438,7 +446,16 @@
             CurrentFileChunk++;
             if ((CurrentFileChunk)*chunksize >= files[CurrentFileId].size) //end of file -> next file
             {
-                PlotAlignment(id, hits, aln_tracks, locus)
+                //compute number of aligned read
+                for (let key in aln_dict[id]){
+                    sum_track[id] += aln_dict[id][key];
+                }
+                for (let key in aln_dict[id]){
+                    if (aln_dict[id][key]> MutationThreshold*sum_track[id]/100){
+                        aln_dict_fil[id][key] = aln_dict[id][key];
+                    }
+                } 
+                PlotAlignment(id, locus)
                 CurrentFileChunk = 0;
                 RestFromLastChunk = "";
                 CurrentFileId++;
@@ -451,7 +468,8 @@
             else
             {
                 // document.getElementById('out').value = aln_tracks[0]
-                document.getElementById('out').value = JSON.stringify(aln_dict[0])
+                document.getElementById('out').value = JSON.stringify(aln_dict_fil[0])
+                //document.getElementById('out').value = aln_tracks[0]
                 DrawPie();
             }
         }
@@ -486,13 +504,7 @@
             var maxsum = 0;
             for (var barcode=0; barcode<192; barcode++)
             {
-                var sum = 0;
-                for (var i=0; i<10000; i++){
-                    if (hits[barcode][i]>=1){
-                        sum++
-                    }
-                }
-                if (sum > maxsum) maxsum = sum;
+                if (sum_track[barcode] > maxsum) maxsum = sum_track[barcode];
             }
             //alert(maxsum)
             
@@ -854,10 +866,8 @@
             return ABC[Math.floor(i/16)] + ((i%16)+1);
         }
 
-
-
         //Alignment summary plot:
-        function PlotAlignment(barcode, hits, align_track, locus)
+        function PlotAlignment(barcode, locus)
         {
             //aggregate aln_track
             //Find top 3:
@@ -880,7 +890,7 @@
             SVGObj.setAttribute("x", 40);
             SVGObj.setAttribute("y", ysize+delypos);
             SVGObj.setAttribute("font-size", "14");
-            SVGObj.textContent = "Gene: "+document.getElementsByName("GeneName")[0].value+"   |   File "+GetWellPos(barcode)+": "+files[barcode].name+"   |   Total reads: ";
+            SVGObj.textContent = "Gene: "+document.getElementsByName("GeneName")[0].value+"   |   File "+GetWellPos(barcode)+": "+files[barcode].name+"   |   Total aligned reads: " + sum_track[barcode];
             svg.appendChild(SVGObj);
             delypos+=delyshift;
             var xfrom = BreakPoint-region_analyse*1 -30;
