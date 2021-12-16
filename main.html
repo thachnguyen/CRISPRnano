@@ -39,7 +39,7 @@
     <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
         <title>CrispNano</title>
         </head>
-        <h1>CRISPRnano: a feature weight webserver for analyzing long-read genome editing </h1>
+        <h1 style="margin:10px 10;">Identification of genome edited cells </h1>
         <!-- <body background="./main_files/theme.jpg" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body> -->
         <body background="" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body>
 
@@ -50,14 +50,16 @@
                 <br>
                 <div class="column">
                 FASTQ Files (*): <a href="javascript:alert(&#39; Your input files your CRISPR experiment data, make sure that the correct ordering is applied in the file browser. We recommend file's size smaller than 200 MB. The file allocation to individual pie charts can be verified by the numbers given below the output pie charts.&#39;)">(?)</a> 
-                    <br><input type="file" id="files" class="input_form" name="files[]" multiple=""><br><br>
+                    <br><input type="file" id="files" class="input_form" name="files[]" multiple=""><br>
                 </div>
                 <div class="column">
                     Barcode Files (Beta version: optional): <a href="javascript:alert(&#39; Your input barcode files your CRISPR experiment data, make sure that the correct ordering of barcode. The file must be in fasta format by the numbers given below the output pie charts.&#39;)">(?)</a> 
-                    <br><input type="file" id="barcode_files" class="input_form" name="files[]" multiple=""> <br><br>
+                    <br><input type="file" id="barcode_files" class="input_form" name="files[]" multiple=""> <br>
                 </div>
-
-                <br>Reference Sequence (*): <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" class="input_form" size="65" name="Locus" value="GAGCCCACCCCCAGGCCCTGCCACTCACCTCTCCACACTGTTGTGGTGGATGCAGCCGTGGGAGCCGCCGACGGCATAGATGTGGCCATCGATGACCCCCACCCCGATGCGGTTACGGGGCACGCTCATGGGGGCGCAGGGCGACCACTGATTGGTCATGGGGTTGT"><br>
+                <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/">(Our test sample)</a><br>
+                
+                <br>Reference Sequence (*): <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" class="input_form" size="65" name="Locus" value="GAGCCCACCCCCAGGCCCTGCCACTCACCTCTCCACACTGTTGTGGTGGATGCAGCCGTGGGAGCCGCCGACGGCATAGATGTGGCCATCGATGACCCCCACCCCGATGCGGTTACGGGGCACGCTCATGGGGGCGCAGGGCGACCACTGATTGGTCATGGGGTTGT"> <br>
+                <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/">(Ensembl reference here)</a><br>
                 
                 <br>Nuclease Target Site (*): <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="RightBS" value="CCGTGGGAGCCGCCGACGG"><br>
                 
@@ -77,7 +79,7 @@
                 <br>Targeting mutagenesis oligonucleotide (optional): <a href="javascript:alert(&#39;If a donor oligonucleotide was used to introduce a site specific genomic alteration (e.g. a single nucleotide base exchange), the respective sequence should be entered here. Please note that the sequence entered must be in the same orientation as the amplicon sequence.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="TargetingOligo" value=""><br>
                 <!--<br>Phred Score Threshold: <a href="javascript:alert(&#39;A Phred Score Threshold is used to specifically consider the read quality of the two bases surrounding the indel position (one base preceding, one base following the indel position). We recommend a default Phred Score Threshold of 12, yet depending on the sequencing quality adjustments should be considered.&#39;)">(?)</a><br><input type="text" size="20" name="PhredThreshold" value="12"><br>-->
                 <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="GeneName" value="KEAP1"><br>
-                <br>Indel Threshold [%]: <a href="javascript:alert('The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered (default is 5 %).')">(?)</a><br><input type="text" size="20" class="input_form" name="MutationThreshold" VALUE="5"></input><br>
+                <br>Indel Threshold [%]: <a href="javascript:alert('The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered (default is 5 %).')">(?)</a><br><input type="text" size="20" class="input_form" name="MutationThreshold" VALUE="5"></input><br> <br>
 
                 <a style="font-style: italic;">
                     CRISPRnano website is free and open to all users and there is no login requirement<br><br></a>
@@ -95,28 +97,12 @@
                 <br>
                 <b>About:</b>
                 <br>
-                <br>CRISPRNano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones. Crispnano supports noisy Oxford Nanopore, Illumina as well as other sequencing data.  
-                CRISPRNano was developed by Dr. Thach Nguyen in the group of Dr. Andrea Rossi, Leibniz Research Institute for Environmental Medicine.
-                The template web interface, data input, output are developped base on the template of Outknocker http://www.outknocker.org/. 
+                <br>CRISPRnano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones.  CRISPRnano supports noisy Oxford Nanopore but also Next Generation Sequencing (NGS) reads such as Illumina and PacBio. CRISPRnano was developed by Dr. Thach Nguyen in the group of Dr. Andrea Rossi (GEMD lab) at Leibniz Research Institute for Environmental Medicine. The template web interface, data input, output are developped base on the template of Outknocker http://www.outknocker.org/. 
                 <br>
-                <br><b>Contact:</b>
-                <br>
-                <br>Dr. Thach Nguyen
-                <br>IUF Institute for Environmental Medicine
-                <br>thach.nguyen@iuf-duesseldorf.de
-                <br>
-                <br><b>Compatibility:</b>
-                <br>
-                <br>CRISPRNano was successfully tested on:
-                <br><li>Mozilla Firefox version 93.0 (Window10 and Linux)<br></li>
-                <li>Google Chrome version 95.0.4638.54 (Window10 and Linux)<br></li>
-                <li>Edge version (Window 10)<br></li>
-                <li>Safari version (MacOS)<br></li>
                 <br>
                 <br><b>Licence:</b>
                 <br>
-                <br>CRISPRNano can be redistributed and/or modified under the terms of the GNU General Public License (Version 2), as published by the Free Software Foundation. A copy of the license can be found online at www.gnu.org/licenses. Crispnano is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.
-                <br>
+                <br>CRISPRnano can be redistributed and/or modified under the terms of the GNU General Public License (Version 2), as published by the Free Software Foundation. A copy of the license can be found online at www.gnu.org/licenses. CRISPRnano is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.                <br>
                 <br><b>Citing CRISPRNano:</b>
                 <br>
                 <br>We kindly request that use of this software be cited in publications as:
