@@ -69,7 +69,7 @@
                     <p>(Advanced) Drag the slider to the left or right to change the interested region</p>
                 <div class="slidecontainer">
                     <input type="range" min="-30" max="30" value="0" class="slider" id="myRange" oninput="this.nextElementSibling.value = this.value">
-                    <p>Offset w.r.t DSP: <span id="demo"></span> <a href="javascript:alert(&#39;You can shift the centre of interest region with respect to the double strand breakpoint (DSB) to the left or right. Default value is double strand breaking point 0&#39;)">(?)</a></p>
+                    <p>Offset w.r.t DSP: <span id="offset_var"></span> <a href="javascript:alert(&#39;You can shift the centre of interest region with respect to the double strand breakpoint (DSB) to the left or right. Default value is double strand breaking point 0&#39;)">(?)</a></p>
                     <br> <br><br>
                   </div>
                 </div> 
@@ -170,7 +170,6 @@
          *
          * @return an integer array
          */
-
         function bsg_enc_seq(seq, table)
         {
             if (table == null) return null;
@@ -245,7 +244,7 @@
          *
          * @return [score,target_start,cigar]. cigar is encoded in the BAM way, where
          * higher 28 bits keeps the length and lower 4 bits the operation in order of
-         * "MIDNSH". See bsa_cigar2str() for converting cigar to string.
+         * "MIDNSH".
          */
         function bsa_align(is_local, target, query, matrix, gapsc, w, table)
         {
@@ -341,33 +340,6 @@
             for (var i = 0; i < cigar.length>>1; ++i) // reverse CIGAR
                 tmp = cigar[i], cigar[i] = cigar[cigar.length-1-i], cigar[cigar.length-1-i] = tmp;
             return [score, start_i, cigar];
-        }
-        function bsa_cigar2gaps(target, query, start, cigar)
-        {
-            var oq = '', ot = '', mid = '', lq = 0, lt = start;
-            for (var k = 0; k < cigar.length; ++k) {
-                var op = cigar[k]&0xf, len = cigar[k]>>4;
-                if (op == 0) { // match
-                    oq += query.substr(lq, len);
-                    ot += target.substr(lt, len);
-                    lq += len, lt += len;
-                } else if (op == 1) { // insertion
-                    oq += query.substr(lq, len);
-                    ot += Array(len+1).join("-");
-                    lq += len;
-                } else if (op == 2) { // deletion
-                    oq += Array(len+1).join("-");
-                    ot += target.substr(lt, len);
-                    lt += len;
-                } else if (op == 4) { // soft clip
-                    lq += len;
-                }
-            }
-            var ut = ot.toUpperCase();
-            var uq = oq.toUpperCase();
-            for (var k = 0; k < ut.length; ++k)
-                mid += ut.charAt(k) == uq.charAt(k)? '|' : ' ';
-            return [ot, oq, mid];
         }
 
         // generate cigar to gap in breakpoint windows, bkp11, bkp22 is offset interest region of ref wrt gap add-in ref 
@@ -496,14 +468,6 @@
             //return [[ot, mid,oq, oq1], aln_type];
         }
 
-        function bsa_cigar2str(cigar)
-        {
-            var s = [];
-            for (var k = 0; k < cigar.length; ++k)
-                s.push((cigar[k]>>4).toString() + "MIDNSHP=XB".charAt(cigar[k]&0xf));
-            return s.join("");
-        }
-
         var bst_nt5 = [
             4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
             4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
@@ -523,7 +487,7 @@
             4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4
         ];
         var slider = document.getElementById("myRange");
-        var output = document.getElementById("demo");
+        var output = document.getElementById("offset_var");
         output.innerHTML = slider.value;
 
         slider.oninput = function() {
@@ -540,8 +504,7 @@
             svg.setAttributeNS(null, "onmousedown", "return false;");
             var NS="http://www.w3.org/2000/svg";
 
-            for (var i=0; i<3; i++)
-            {
+            for (var i=0; i<3; i++) {
                 SVGtab[i] = document.createElementNS(NS,"rect");
                 svg.appendChild(SVGtab[i]);
                 SVGtab[i].setAttribute("fill", BLAU[i%3]);
@@ -598,21 +561,17 @@
         aln_dict_fil = Array(96)
         aln_type_dict = Array(96)
 
-
-        for (var i=0; i<96; i++)
-        {
+        for (var i=0; i<96; i++) {
             hits[i] = Array(1000000);
             aln_dict[i] = {}
             aln_dict_fil[i] = {}
             aln_type_dict[i] = {}
-            for (var ii=0; ii<1000000; ii++)
-            {
+            for (var ii=0; ii<1000000; ii++) {
                 hits[i][ii] = -1;
             }
         }
     
         var AlignmentPrecalc = new Array(96);
- 
         var locus, locuslen;
         var files;
         var reader;
@@ -623,17 +582,14 @@
         var rightbs;
         var aln_tracks = Array(96);
         var aln_loc_seq = Array(96)
-        for (var i=0; i<96; i++)
-        {
+        for (var i=0; i<96; i++) {
             aln_tracks[i] = ''
         }
         // indel location and seq
         var aln_loc_seq = Array(96)
-        for (var i=0; i<96; i++)
-        {
+        for (var i=0; i<96; i++) {
             aln_loc_seq[i] = Array(1000000);
-            for (var ii=0; ii<1000000; ii++)
-            {
+            for (var ii=0; ii<1000000; ii++) {
                 aln_loc_seq[i][ii] = '';
             }
         }
@@ -649,8 +605,7 @@
         function ReverseComplement(A)
         {
             var dummy = "";
-            for (var i=0; i<A.length; i++)
-            {
+            for (var i=0; i<A.length; i++) {
                 if (A[A.length-1-i] == 'G') dummy += 'C';
                 if (A[A.length-1-i] == 'A') dummy += 'T';
                 if (A[A.length-1-i] == 'T') dummy += 'A';
@@ -672,21 +627,17 @@
             region_analyse = document.getElementsByName("region_analyse")[0].value;
 
             //Find Target site in the wild type sequence:
-            if (RightBsLen == 0)
-            {
+            if (RightBsLen == 0){
                 alert("No target site was entered. Please enter a valid sequence");
                 return;
             }
             RightBsPos = locus.search(rightbs);
-            if (RightBsPos == -1)
-            {
+            if (RightBsPos == -1) {
                 RightBsPos = locus.search(ReverseComplement(rightbs));
-                if (RightBsPos == -1)
-                {
+                if (RightBsPos == -1) {
                     alert("The target site was not found in the reference sequence. Please enter a valid sequence");
                     return;
-                }
-                else{
+                } else {
                     alert("The sgRNA was reverse, please enter a reverse sequence sgRNA");
                 }
             }
@@ -697,8 +648,7 @@
             var evt = document.getElementById('files');
             files = evt.files;
 
-            if (files.length <= 0)
-            {
+            if (files.length <= 0) {
                 alert("No files were specified. Please upload your fastq files");
                 return;
             }
@@ -726,8 +676,7 @@
 
             var readnum = 0;
             var str = ''
-            while (true) 
-            {
+            while (true) {
                 var cursor1 = cursor;
                 while (++cursor1<origlen && original[cursor1] != "\n");
                 var cursor2 = cursor1+1;
@@ -752,28 +701,28 @@
                     hits[id][readnum] = aln_type
                     var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
                     var str1 = ''
-
-                    str1 += 'alignment track:\n';
                     var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
                     var fmt = fmt1[0]
                                   
                     str1 += fmt[0] + '\n';
                     str1 += fmt[1] + '\n';
+                     
+                    if (aln_dict[id].hasOwnProperty(str1)){
+                        aln_dict[id][str1]+=1
+                    }
+                    else {
+                        aln_dict[id][str1] = 1
+                        aln_type_dict[id][str1] = aln_type
+                    }
                     aln_tracks[id] +=str1
+                    hits[id][readnum] = aln_type
                     readnum++;
-                }
-                else{
+                } else { 
                     var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
-                    var str1 = 'file_id ' +id+ ';  read number: ' + readnum +'\n';
                     var str1 = ''
-                    // str1 += 'score: ' + rst[0] + '\n';
-                    // str1 += 'start: ' + rst[1] + '\n';
-                    // str1 += 'cigar: ' + bsa_cigar2str(rst[2]) + '\n';
-                    //str1 += 'alignment track:\n';
                     var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
                     var fmt = fmt1[0]
                     aln_type = fmt1[1]
-
                     str1 += fmt[0] + '\n';
                     str1 += fmt[1] + '\n';
                     //aggregate aln track into dictionary
@@ -862,12 +811,9 @@
                 CurrentFileId++;
                 //id++;
             }
-            if (CurrentFileId < files.length && CurrentFileId<96)
-            {
+            if (CurrentFileId < files.length && CurrentFileId<96) {
                 setTimeout("ReadNextFileChunk();",10);
-            }
-            else
-            {
+            } else {
                 // for DEBUG
                 // document.getElementById('out').value = aln_tracks[0]
                 //document.getElementById('out').value = JSON.stringify(aln_dict_fil[0])
@@ -903,8 +849,7 @@
             var BLAU=["rgb(50,42,126)","rgb(16,115,179)","rgb(38,170,220)"];
 
             var maxsum = 0;
-            for (var barcode=0; barcode<96; barcode++)
-            {
+            for (var barcode=0; barcode<96; barcode++) {
                 if (summary_track[barcode][7] > maxsum) maxsum = summary_track[barcode][7];
             }
             //alert(maxsum)
@@ -941,8 +886,7 @@
                 var size = 24*Math.sqrt(summary_track[barcode][7]/maxsum);
                 var midx = (barcode%12)*50 + 25;
                 var midy = Math.floor(barcode/12) * 65 + 25;
-                if (summary_track[barcode][7] > 0)
-                {
+                if (summary_track[barcode][7] > 0) {
                     //wt:
                     var angle = -3.1415/2;
                     var lastangle = angle;
@@ -1200,8 +1144,7 @@
                 SVGObj.setAttribute("text-anchor", "middle");
                 SVGObj.setAttribute("pointer-events","none");
                 var fn = "-";
-                if (barcode<files.length)
-                {
+                if (barcode<files.length){
                     fn = files[barcode].name.split(".")[0];
                     if (fn.length > 4) fn = fn.substr(0,4)+"..";
                 }
@@ -1211,8 +1154,7 @@
             //legende:
             var midx = 13*50 + 25;
             var midy = 0 * 65 + 25;
-            for (var i=0; i<8; i++)
-            {
+            for (var i=0; i<8; i++) {
                 var vol = Math.floor(maxsum/100)*100/Math.pow(2,i);
                 var size = 24*Math.sqrt(vol/maxsum);
                 //SVG:
@@ -1246,8 +1188,7 @@
                 if (i==7) SVGObj.style.fill="rgb(200,200,200)";
                 if (i==8) SVGObj.style.fill="rgb(0,200,0)";
                 if (i==9) SVGObj.style.fill="rgb(70,70,70)";
-                if (i==10)
-                {
+                if (i==10){
                     SVGObj.style.fill="none";
                     SVGObj.style.stroke="rgb(0,0,0)";
                     SVGObj.setAttributeNS(null, "stroke-width", 0.5);
@@ -1305,6 +1246,7 @@
             svg.appendChild(SVGObj);
             document.title = "Result for "+document.getElementsByName("GeneName")[0].value+" ("+files.length+" barcodes read)";
         }
+
         function PieClick(evt)
         {
             var top = document.getElementById("SVGpie").getBoundingClientRect().top;
@@ -1315,24 +1257,22 @@
             var xx = Math.round((x-25)/50);
             var yy = Math.round((y-25)/65);
 
-            //alert(xx+" "+yy);
             SelectClone(xx+12*yy);
         }
+
         var CurrentAlignment = 0;
         function SelectClone(barcode)
         {
-            if (AlignmentPrecalc[barcode])
-            {
+            if (AlignmentPrecalc[barcode]){
                 document.getElementById("DIV_alignment").innerHTML = AlignmentPrecalc[barcode];
                 CurrentAlignment = barcode;
-            }
-            else alert("No data available for the selected barcode.");
+            } else alert("No data available for the selected barcode.");
         }
 
         function GetWellPos(i)
         {
             var ABC = "ABCDEFGHIJKL";
-            return ABC[Math.floor(i/16)] + ((i%16)+1);
+            return ABC[Math.floor(i/12)] + ((i%12)+1);
         }
 
         //Alignment summary plot:
@@ -1347,8 +1287,7 @@
             var NS="http://www.w3.org/2000/svg";
             var strokew = "0.5";
             //Clear:
-            while (svg.lastChild)
-            {
+            while (svg.lastChild){
                 svg.removeChild(svg.lastChild);
             }
 
@@ -1450,15 +1389,12 @@
                 SVGObj.setAttribute("font-size", "14");
                 SVGObj.textContent +="TYPE: "+ aln_type[aln_type_dict[barcode][key]] +" | " +aln_dict_fil[barcode][key] +"  Reads, " + (aln_dict_fil[barcode][key]/summary_track[barcode][7]*100).toFixed(2) + " %";
                 // SVGObj.textContent +="TYPE: "+ aln_type_dict[barcode][key] +" | " +aln_dict_fil[barcode][key] +"  Reads, " + (aln_dict_fil[barcode][key]/summary_track[barcode][7]*100).toFixed(2) + " %";
-
                 svg.appendChild(SVGObj);
-
                 id1+=1;
                 delypos+=delyshift;
             }
             AlignmentPrecalc[barcode] = document.getElementById("DIV_alignment").innerHTML;
         }
-
 
         function SaveSVG()
         {
@@ -1506,52 +1442,6 @@
             printWindow.document.close();
             printWindow.print();
             printWindow.close();
-        }
-
-        function SaveTable()
-        {
-            var out = "file name\ttotal reads\twild type reads\tInDel reads\tInDel at targetsite\tframeshift at targetsite\ttargeted mutagenesis\tfailed alignment\n";
-            for (var barcode=0; barcode<96; barcode++)
-            {
-                //calculate relevant mutation rate:
-                var sum = 0; for (var i=0; i<250; i++) for (var ii=0; ii<150; ii++) sum += hits[barcode][i][ii];
-                var wt = 0, anymut = 0, relevantmut = 0, relevantframeshiftmut = 0, targetedmut = 0, failedalignment = 0;
-                for (var i=0; i<250; i++) for (var ii=0; ii<150; ii++) if (i!=0 || ii!=10)
-                {
-                    if (ii == 149) targetedmut += hits[barcode][i][ii];
-
-                    anymut += hits[barcode][i][ii];
-
-                    //check if mutation touches the target site:
-                    var ok = false;
-                    if (i >= RightBsPos && i < RightBsPos+RightBsLen) ok = true;
-                    if (i < RightBsPos && i+ii-10 >= RightBsPos+RightBsLen) ok = true;
-                    for (var iii=i; iii<i+ii-10; iii++) if (iii >= RightBsPos && iii < RightBsPos+RightBsLen) ok = true;
-                    if (ok)
-                    {
-                        relevantmut += hits[barcode][i][ii];
-
-                        var frameshift = (3000-(ii-10))%3;
-                        if (frameshift != 0) relevantframeshiftmut += hits[barcode][i][ii];
-                    }
-                }
-                wt = hits[barcode][0][10];
-                failedalignment = ShiftUnresolved[barcode];
-
-                if (barcode<files.length && files[barcode].name.split("_").length>=1)
-                {
-                    var fn = files[barcode].name;//.split("_")[0];
-                    out += fn + "\t" + sum + "\t" + wt +"\t" + anymut + "\t" + relevantmut + "\t" + relevantframeshiftmut + "\t" + targetedmut + "\t" + failedalignment + "\n";
-                }
-            }
-            var bb = new Blob([out], {type: 'text/plain'});
-            var a = document.createElement('a');
-            a.download = "mutation_table.txt";
-            a.href = window.URL.createObjectURL(bb);
-            a.textContent = 'Click here to save';
-            a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
-            document.getElementById("save").appendChild(a);
-            a.click();
         }
     </script>
 </html>
