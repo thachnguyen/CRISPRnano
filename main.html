@@ -35,6 +35,63 @@
         cursor: pointer;
         }
 
+        /* Popup container - can be anything you want */
+.popup {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* The actual popup */
+.popup .popuptext {
+  visibility: hidden;
+  width: 460px;
+  background-color: rgb(110, 110, 110);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -80px;
+}
+
+/* Popup arrow */
+.popup .popuptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Toggle this class - hide and show the popup */
+.popup .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+  from {opacity: 0;} 
+  to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}
+
     </style>
     <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
         <title>CrispNano</title>
@@ -42,49 +99,84 @@
         <h1 style="margin:10px 10;">Identification of genome edited cells </h1>
         <!-- <body background="./main_files/theme.jpg" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body> -->
         <body background="" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body>
-
         <br>
          <div id="save" style="display:none">test</div>
             <div id="setup" style="position:absolute; left:20px; top:80px">
                 <br>
                 <br>
                 <div class="column">
-                FASTQ Files (*): <a href="javascript:alert(&#39; Your input files your CRISPR experiment data, make sure that the correct ordering is applied in the file browser. We recommend file's size smaller than 200 MB. The file allocation to individual pie charts can be verified by the numbers given below the output pie charts.&#39;)">(?)</a> 
+                FASTQ Files (*): 
+                <div class="popup" onclick="myFunction1()">(? Click here!)
+                    <span class="popuptext" id="help1">Your input files your CRISPR experiment data, make sure that the correct ordering is applied in the file browser. We recommend file's size smaller than 200 MB. The file allocation to individual pie charts can be verified by the numbers given at alignment track. Click to close.</span>
+                </div>
                     <br><input type="file" id="files" class="input_form" name="files[]" multiple=""><br>
                 </div>
                 <div class="column">
-                    Barcode Files (Beta version: optional): <a href="javascript:alert(&#39; Your input barcode files your CRISPR experiment data, make sure that the correct ordering of barcode. The file must be in fasta format by the numbers given below the output pie charts.&#39;)">(?)</a> 
+                    Barcode Files (Beta version): 
+                    <div class="popup" onclick="myFunction2()">(? Click here!)
+                        <span class="popuptext" id="help2">Still testing, Not in this release yet. Click to close.</span>
+                        <!-- Your input barcode files your CRISPR experiment data, make sure that the correct ordering of barcode. The file must be in fasta format by the numbers given below the output pie charts -->
+                    </div>
                     <br><input type="file" id="barcode_files" class="input_form" name="files[]" multiple=""> <br>
                 </div>
-                <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/">(Our test sample)</a><br>
+                <a href="https://iufduesseldorf-my.sharepoint.com/:u:/g/personal/thach_nguyen_iuf-duesseldorf_de/EdYAlFfBZeVCgQvy0nFpHuIBBduWCRSRdgqmog-yiXo7FQ?e=3opfa6">(Our test sample)</a><br>
                 
-                <br>Reference Sequence (*): <a href="javascript:alert(&#39; Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle.&#39;)">(?)</a><br><input type="text" class="input_form" size="65" name="Locus" value="GAGCCCACCCCCAGGCCCTGCCACTCACCTCTCCACACTGTTGTGGTGGATGCAGCCGTGGGAGCCGCCGACGGCATAGATGTGGCCATCGATGACCCCCACCCCGATGCGGTTACGGGGCACGCTCATGGGGGCGCAGGGCGACCACTGATTGGTCATGGGGTTGT"> <br>
-                <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/">(Ensembl reference here)</a><br>
+                <br>Reference Sequence (*):                 
+                <div class="popup" onclick="myFunction3()">(? Click here!)
+                    <span class="popuptext" id="help3">Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle. You can get the reference from Ensembl link below. Click to close</span>
+                </div>              
+                <br><input type="text" class="input_form" size="65" name="Locus" value="GAGCCCACCCCCAGGCCCTGCCACTCACCTCTCCACACTGTTGTGGTGGATGCAGCCGTGGGAGCCGCCGACGGCATAGATGTGGCCATCGATGACCCCCACCCCGATGCGGTTACGGGGCACGCTCATGGGGGCGCAGGGCGACCACTGATTGGTCATGGGGTTGT"> 
+                <br>              
+                <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/">(Ensembl reference)</a><br>
                 
-                <br>Nuclease Target Site (*): <a href="javascript:alert(&#39;In this field the nuclease target site is entered. The sequence does not have to be in the same orientation as the PCR amplicon sequence above.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="RightBS" value="CCGTGGGAGCCGCCGACGG"><br>
+                <br>Nuclease Target Site (*): 
+                <div class="popup" onclick="myFunction4()">(? Click here!)
+                    <span class="popuptext" id="help4">In this field the nuclease target site is entered. The sequence have to be in the same orientation as the reference sequence above. Click to close</span>
+                </div>
+                <br><input type="text" class="input_form" size="40" name="RightBS" value="CCGTGGGAGCCGCCGACGG"><br>
                 
                 <div class="column">
-                <br>Interested region (optional) +/- bp: <a href="javascript:alert(&#39;it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely higher false discover rate you can get because of noisy data. You can change the central point of interested region to the left or right. Default is double strand breaking point&#39;)">(?)</a><br><input type="text" size="20" name="region_analyse" value="20" class="input_form" ><br>
+                <br>Interested region (optional) +/- bp: 
+                <div class="popup" onclick="myFunction5()">(? Click here!)
+                    <span class="popuptext" id="help5">it is recommended to use only the +/-15 bases surrounding the desired breaking point, if you select larger region, the more likely higher false discover rate you can get because of noisy data. You can change the central point of interested region to the left or right. Default is double strand breaking point. Click to close</span>
+                </div>
+                <br><input type="text" size="20" name="region_analyse" value="20" class="input_form" ><br>
                    <br> 
                 </div> 
                 <div class="column">
                     <p>(Advanced) Drag the slider to the left or right to change the interested region</p>
                 <div class="slidecontainer">
                     <input type="range" min="-30" max="30" value="0" class="slider" id="myRange" oninput="this.nextElementSibling.value = this.value">
-                    <p>Offset w.r.t DSP: <span id="offset_var"></span> <a href="javascript:alert(&#39;You can shift the centre of interest region with respect to the double strand breakpoint (DSB) to the left or right. Default value is double strand breaking point 0&#39;)">(?)</a></p>
+                    <p>Offset w.r.t DSP: <span id="offset_var"></span> 
+                        <div class="popup" onclick="myFunction6()">(? Click here!)
+                            <span class="popuptext" id="help6">You can shift the centre of interest region with respect to the double strand breakpoint (DSB) to the left or right. Default value is double strand breaking point 0. Click to close</span>
+                        </div>
+                    </p>
                     <br> <br><br>
                   </div>
                 </div> 
 
-                <br>Targeting mutagenesis oligonucleotide (optional): <a href="javascript:alert(&#39;If a donor oligonucleotide was used to introduce a site specific genomic alteration (e.g. a single nucleotide base exchange), the respective sequence should be entered here. Please note that the sequence entered must be in the same orientation as the amplicon sequence.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="TargetingOligo" value=""><br>
+                <br>Targeting mutagenesis oligonucleotide (optional): 
+                <div class="popup" onclick="myFunction7()">(? Click here!)
+                    <span class="popuptext" id="help7">If a donor oligonucleotide was used to introduce a site specific genomic alteration (e.g. a single nucleotide base exchange), the respective sequence should be entered here. Please note that the sequence entered must be in the same orientation as the amplicon sequence. Click to close.</span>
+                </div>
+                <br><input type="text" class="input_form" size="40" name="TargetingOligo" value=""><br>
                 <!--<br>Phred Score Threshold: <a href="javascript:alert(&#39;A Phred Score Threshold is used to specifically consider the read quality of the two bases surrounding the indel position (one base preceding, one base following the indel position). We recommend a default Phred Score Threshold of 12, yet depending on the sequencing quality adjustments should be considered.&#39;)">(?)</a><br><input type="text" size="20" name="PhredThreshold" value="12"><br>-->
-                <br>Gene Name (optional): <a href="javascript:alert(&#39;Name of the study gene, program will search for reference sequence from our database.&#39;)">(?)</a><br><input type="text" class="input_form" size="40" name="GeneName" value="KEAP1"><br>
-                <br>Indel Threshold [%]: <a href="javascript:alert('The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered (default is 5 %).')">(?)</a><br><input type="text" size="20" class="input_form" name="MutationThreshold" VALUE="5"></input><br> <br>
+                <br>Gene Name (optional):
+                <div class="popup" onclick="myFunction8()">(? Click here!)
+                    <span class="popuptext" id="help8">Name of the study gene. Automatic query from genename is not implemented yet. Click to close.</span>
+                </div> 
+                <br><input type="text" class="input_form" size="40" name="GeneName" value="KEAP1"><br>
+                <br>Indel Threshold [%]: 
+                <div class="popup" onclick="myFunction9()">(? Click here!)
+                    <span class="popuptext" id="help9">The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered, we recommend to use 5% for ONT data. (default is 5 %). Click to close.</span>
+                </div> 
+                <br><input type="text" size="20" class="input_form" name="MutationThreshold" VALUE="5"></input><br> <br>
 
                 <a style="font-style: italic;">
-                    CRISPRnano website is free and open to all users and there is no login requirement<br>
-                    To use CRISPRnano, you must enable Javascript on your web browser.<br>
-                    If you want to use CRISPRnano offline, please download <a href="https://github.com/thachnguyen/CRISPRnano/blob/11c567108017df49ec6f9ed623f1caf397a62133/main.html"> the offline html file here.</a> <br>
+                    CRISPRnano website is free and open to all users and there is no login required.<br>
+                    To use CRISPRnano, you must enable JavaScript on your web browser.<br>
+                    If you want to use CRISPRnano offline, please download <a href="https://iufduesseldorf-my.sharepoint.com/:u:/g/personal/thach_nguyen_iuf-duesseldorf_de/EbMnm12C_zNEpgQbE7UefOQBFIaMPfZZOmgmgUvL-iea8A?e=uxloCX"> the offline html file here.</a> <br>
             
                     <br></a>
                 <a style="font-style: italic;"> (*) Mandatory field </a>
@@ -1433,6 +1525,52 @@
             printWindow.document.close();
             printWindow.print();
             printWindow.close();
+        }
+        // For google site
+        function myFunction1() 
+        {
+            var popup = document.getElementById("help1");
+            popup.classList.toggle("show");
+        }
+        function myFunction2() 
+        {
+            var popup = document.getElementById("help2");
+            popup.classList.toggle("show");
+        }
+        function myFunction3() 
+        {
+            var popup = document.getElementById("help3");
+            popup.classList.toggle("show");
+        }
+        function myFunction4() 
+        {
+            var popup = document.getElementById("help4");
+            popup.classList.toggle("show");
+        }
+        function myFunction6() 
+        {
+            var popup = document.getElementById("help6");
+            popup.classList.toggle("show");
+        }
+        function myFunction7() 
+        {
+            var popup = document.getElementById("help7");
+            popup.classList.toggle("show");
+        }
+        function myFunction8() 
+        {
+            var popup = document.getElementById("help8");
+            popup.classList.toggle("show");
+        }
+        function myFunction9() 
+        {
+            var popup = document.getElementById("help9");
+            popup.classList.toggle("show");
+        }
+        function myFunction5() 
+        {
+            var popup = document.getElementById("help5");
+            popup.classList.toggle("show");
         }
     </script>
 </html>
