@@ -83,7 +83,9 @@
 
                 <a style="font-style: italic;">
                     CRISPRnano website is free and open to all users and there is no login requirement<br>
-                    To use CRISPRnano, you must enable Javascript on your web browser.
+                    To use CRISPRnano, you must enable Javascript on your web browser.<br>
+                    If you want to use CRISPRnano offline, please download <a href="https://github.com/thachnguyen/CRISPRnano/blob/11c567108017df49ec6f9ed623f1caf397a62133/main.html"> the offline html file here.</a> <br>
+            
                     <br></a>
                 <a style="font-style: italic;"> (*) Mandatory field </a>
                 <br>
@@ -1131,12 +1133,13 @@
                 SVGObj.setAttribute("font-size", "11");
                 SVGObj.setAttribute("text-anchor", "middle");
                 SVGObj.setAttribute("pointer-events","none");
-                var fn = "-";
-                if (barcode<files.length){
-                    fn = files[barcode].name.split(".")[0];
-                    if (fn.length > 4) fn = fn.substr(0,4)+"..";
-                }
-                SVGObj.textContent = fn;//barcode+1;
+                // var fn = "-";
+                // if (barcode<files.length){
+                //     fn = files[barcode].name.split(".")[0];
+                //     if (fn.length > 4) fn = fn.substr(0,4)+"..";
+                // }
+                // SVGObj.textContent = fn;//barcode+1;
+                SVGObj.textContent = GetWellPos(barcode);
                 svg.appendChild(SVGObj);
             }
             //legende:
