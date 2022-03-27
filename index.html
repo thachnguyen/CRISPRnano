@@ -136,7 +136,7 @@
                 <div class="column">
                 <br>Interested region (optional) +/- bp: 
                 <div class="popup" onclick="myFunction5()">(? Click here!)
-                    <span class="popuptext" id="help5"> For ONT reads, it is recommend to use -/+15 bases around the predicted DNA lesion. Larger regions are prone to false positive indels. Larger regions (total of 200-250 bp) can be safely used with Illumina reads. You can drag and drop the central point of the predicted double strand break in the genomic sequence to the left or to the right. Default 0 is double strand breaking point. Click again to close</span>
+                    <span class="popuptext" id="help5"> For ONT reads, it is recommended to use -/+15 bases around the predicted DNA lesion. Larger regions are prone to false positive indels. Larger regions (total of 200-250 bp) can be safely used with Illumina reads. You can drag and drop the central point of the predicted double strand break in the genomic sequence to the left or to the right. Default 0 is double strand breaking point. Click again to close</span>
                 </div>
                 <br><input type="text" size="20" name="region_analyse" value="20" class="input_form" ><br>
                    <br> 
@@ -156,7 +156,7 @@
 
                 <br>Targeting mutagenesis oligonucleotide (optional): 
                 <div class="popup" onclick="myFunction7()">(? Click here!)
-                    <span class="popuptext" id="help7">Donor oligonucleotide sequence used to introduce a site specific genomic modification. The sequence entered should be in the same orientation of as the amplicon sequence. Click again to close.</span>
+                    <span class="popuptext" id="help7">Donor oligonucleotide sequence used to introduce a site specific genomic modification. The sequence entered should be in the same orientation as the amplicon sequence. Click again to close.</span>
                 </div>
                 <br><input type="text" class="input_form" size="40" name="TargetingOligo" value=""><br>
                                 <br>Gene Name (optional):
@@ -193,6 +193,69 @@
                 <br>CRISPRnano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones.  
                 CRISPRnano supports noisy Oxford Nanopore but also Next Generation Sequencing (NGS) reads such as Illumina and PacBio or Sanger Sequencing. <br> <br>
 
+                CRISPRnano was developed by Dr. Thach Nguyen in the group of Dr. Andrea Rossi (GEMD lab) at Leibniz Research Institute for Environmental Medicine. The template web interface, data input, output are developped based on the template of Outknocker http://www.outknocker.org/. 
+                <br>
+                <br>
+                <br><b>Licence:</b>
+                <br>
+                <br>CRISPRnano can be redistributed and/or modified under the terms of the GNU General Public License (Version 2), as published by the Free Software Foundation. A copy of the license can be found online at www.gnu.org/licenses. CRISPRnano is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.                <br>
+                <br><b>Citing CRISPRnano:</b>
+                <br>
+                <br>
+                <br>We kindly request that use of this software be cited in publications as:<br>
+                Identification of genome edited cells using CRISPRnano (2022). 
+                <br>   
+              <br><br>
+            </li></div>
+
+            <div id="manual" style="position: absolute; left: 20px; top: 120px; width: 70%; display: none;">
+                <br>
+                <br>
+                <h3>CRISPRnano manual</h3>
+                CRISPRnano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones. CRISPRnano supports noisy Oxford Nanopore but also Next Generation Sequencing (NGS) reads such as Illumina and PacBio or Sanger Sequencing.<br><br>
+                <b>Input data:</b>
+                <br>
+                <br>CRISPRnano analyzes FASTQ output files from Illumina or ONT. Our webserver analyzes multiple samples and support up to 96 fastq files.
+                We recommend file's size smaller than 200MB. Make sure that the correct ordering is applied in the file browser. 
+                The file allocation to individual pie charts can be verified by the numbers given at alignment track. <br>
+                Our data contains multiple small FASTQ files, we can concatenate them into a lower number of aggregated samples using command <b>cat</b> under Linux or <b>type</b> under Windows environment.<br>
+                On Linux terminal:<br>
+                $ cat /path/to/fastq/files/*.fastq > /your/new/location/output.fastq<br><br>
+                On Window command prompt (path symbol is different):<br>
+                $ type \path\to\fastq\files\*.fastq> \your\new\location\output.fastq<br>
+                
+                <br>
+                <b>Reference sequences</b> 
+                <br>
+                Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle. 
+                You can get the reference from <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/"> Ensembl database</a>. <br><br>
+
+                <b>Nuclease Target Site</b> 
+                <br>
+                The Nuclease Target Site sequence has to be in the same orientation as the reference sequence above. The Nuclease Target Site is briefly checked if it is contained in Reference genome<br><br>
+                
+                <b>Interested region and Offset centre</b> 
+                <br>
+                For ONT reads, it is recommended to use -/+15 bases around the predicted DNA lesion. Larger regions are prone to false positive indels. 
+                Larger regions (total of 200-250 bp) can be safely used with Illumina reads. You can drag and drop the central point of the predicted double strand break in the genomic sequence to the left or to the right. Default 0 is double strand breaking point.<br><br>
+                
+                <b>Targeting mutagenesis oligonucleotide</b> 
+                <br>
+                Donor oligonucleotide sequence used to introduce a site specific genomic modification. 
+                The sequence entered should be in the same orientation as the amplicon sequence. <br><br>
+                <b>Indel Threshold</b> 
+                <br>
+                The Indel Threshold percentage determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. 
+                Low threshold values can result in false positive allele calling due to sequencing errors, 
+                whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered. We recommend to use 5% for ONT reads and 2% for Illumina reads (default is set to 5%).  <br><br>
+                
+                <b>Code Availability </b> 
+                <br>
+                The source code for CRISPRnano is available at <a href="https://github.com/thachnguyen/CRISPRnano">https://github.com/thachnguyen/CRISPRnano</a> <br><br>
+                
+                <b>Test data </b> 
+                <br>
+                The testdata for CRISPRnano is available at <a href="https://iufduesseldorf-my.sharepoint.com/:u:/g/personal/thach_nguyen_iuf-duesseldorf_de/ER4kM3RQaRJLiltUCpcT2iMBiEvGvs3u2NiDTdtSPBLE1Q?e=8FEAJc">our test sample.</a><br><br>
                 <b>
                     Browser compatibility
                 </b>
@@ -215,11 +278,11 @@
                     </tr>
                     <tr>
                         <td>MacOS</td>
-                        <td>HighSierra</td>
+                        <td>Monterey</td>
                         <td>Version 99.0.4844.51</td>
                         <td>98.0</td>
                         <td>n/a</td>
-                        <td>13.1.2 </td>
+                        <td>15.3 </td>
                     </tr>
                     <tr>
                         <td>Windows</td>
@@ -231,21 +294,7 @@
                     </tr>
                   </table>
                 
-
-                CRISPRnano was developed by Dr. Thach Nguyen in the group of Dr. Andrea Rossi (GEMD lab) at Leibniz Research Institute for Environmental Medicine. The template web interface, data input, output are developped based on the template of Outknocker http://www.outknocker.org/. 
-                <br>
-                <br>
-                <br><b>Licence:</b>
-                <br>
-                <br>CRISPRnano can be redistributed and/or modified under the terms of the GNU General Public License (Version 2), as published by the Free Software Foundation. A copy of the license can be found online at www.gnu.org/licenses. CRISPRnano is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.                <br>
-                <br><b>Citing CRISPRNano:</b>
-                <br>
-                <br>
-                <br>We kindly request that use of this software be cited in publications as:<br>
-                Identification of genome edited cells using CRISPRnano (2022). 
-                <br>   
-              <br><br>
-            </li></div>
+            </div>
 
             <div id="results" style="position: absolute; left: 20px; top: 160px; display: none;">
                 <div id="DIV_piecharts">
@@ -615,7 +664,7 @@
 
         //Top Menu:
         var SVGtab = new Array(10), SVGtabtext = new Array(10);
-        var tabtextcontent = ["Genome Editing Analyzer", "Results", "About CRISPRnano"];
+        var tabtextcontent = ["GENOME EDITTING ANALYZER", "RESULTS", "MANUAL & DOCUMENT", "ABOUT CRISPRnano"];
         var BLAU=["rgb(0, 0, 0)","rgb(221,0,0)","rgb(255,206,0)"];
         function GenerateTopMenu()
         {
@@ -623,7 +672,7 @@
             svg.setAttributeNS(null, "onmousedown", "return false;");
             var NS="http://www.w3.org/2000/svg";
 
-            for (var i=0; i<3; i++) {
+            for (var i=0; i<4; i++) {
                 SVGtab[i] = document.createElementNS(NS,"rect");
                 svg.appendChild(SVGtab[i]);
                 SVGtab[i].setAttribute("fill", BLAU[i%3]);
@@ -659,10 +708,10 @@
             if (i==1) document.getElementById("results").style.display = "";
             else document.getElementById("results").style.display = "none";
 
-            // if (i==2) document.getElementById("results_temp").style.display = "";
-            // else document.getElementById("results_temp").style.display = "none";
+            if (i==2) document.getElementById("manual").style.display = "";
+            else document.getElementById("manual").style.display = "none";
 
-            if (i==2) document.getElementById("about").style.display = "";
+            if (i==3) document.getElementById("about").style.display = "";
             else document.getElementById("about").style.display = "none";
 
             document.getElementById("progress").style.display = "none";
