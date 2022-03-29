@@ -212,13 +212,14 @@
                 <br>
                 <br>
                 <h3>CRISPRnano manual</h3>
-                CRISPRnano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones. CRISPRnano supports noisy Oxford Nanopore but also Next Generation Sequencing (NGS) reads such as Illumina and PacBio or Sanger Sequencing.<br><br>
+                CRISPRnano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones. CRISPRnano supports noisy Oxford Nanopore but also Next Generation Sequencing (NGS) reads such as Illumina, PacBio, or classic Sanger Sequencing.<br><br>
                 <b>Input data:</b>
                 <br>
-                <br>CRISPRnano analyzes FASTQ output files from Illumina or ONT. Our webserver analyzes multiple samples and support up to 96 fastq files.
-                We recommend file's size smaller than 200MB. Make sure that the correct ordering is applied in the file browser. 
-                The file allocation to individual pie charts can be verified by the numbers given at alignment track. <br>
-                Our data contains multiple small FASTQ files, we can concatenate them into a lower number of aggregated samples using command <b>cat</b> under Linux or <b>type</b> under Windows environment.<br>
+                <br>CRISPRnano analyzes FASTQ output files from ONT, NGS, or Sanger systems.
+                CRISPRnano webserver analyzes multiple samples and supports up to 96 FASTQ files at the time.
+                We recommend a file's size smaller than 200MB. Please, make sure that the correct ordering is applied in the file browser.
+                The file allocation to individual pie charts can be verified by the numbers given at alignment track.
+                Our data contains multiple small FASTQ files.  FASTQ files can be concatenated using command <b>cat</b> under Linux or <b>type</b> under Windows environment.<br>
                 On Linux terminal:<br>
                 $ cat /path/to/fastq/files/*.fastq > /your/new/location/output.fastq<br><br>
                 On Window command prompt (path symbol is different):<br>
@@ -227,12 +228,11 @@
                 <br>
                 <b>Reference sequences</b> 
                 <br>
-                Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle. 
-                You can get the reference from <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/"> Ensembl database</a>. <br><br>
+                Reference amplicon length should be in the range of 200-350 bases (based on your library preparation), with the nuclease target site located roughly in the middle. The reference sequence of your gene of interest can be retrieved from <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/"> Ensembl database</a>. <br><br>
 
                 <b>Nuclease Target Site</b> 
                 <br>
-                The Nuclease Target Site sequence has to be in the same orientation as the reference sequence above. The Nuclease Target Site is briefly checked if it is contained in Reference genome<br><br>
+                The Nuclease Target Site sequence (CRISPR, TALEN, ZINC-Finger, etc.) has to be in the same orientation as the reference sequence above. The Nuclease Target Site is briefly checked if it is contained in Reference genome<br><br>
                 
                 <b>Interested region and Offset centre</b> 
                 <br>
@@ -241,13 +241,13 @@
                 
                 <b>Targeting mutagenesis oligonucleotide</b> 
                 <br>
-                Donor oligonucleotide sequence used to introduce a site specific genomic modification. 
+                Donor oligonucleotide sequence is used to introduce a site specific genomic modification. 
                 The sequence entered should be in the same orientation as the amplicon sequence. <br><br>
                 <b>Indel Threshold</b> 
                 <br>
                 The Indel Threshold percentage determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. 
                 Low threshold values can result in false positive allele calling due to sequencing errors, 
-                whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered. We recommend to use 5% for ONT reads and 2% for Illumina reads (default is set to 5%).  <br><br>
+                whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered. We recommend using 5% for ONT reads and 2% for Illumina reads (the default is set to 5%).  <br><br>
                 
                 <b>Code Availability </b> 
                 <br>
