@@ -31,5 +31,5 @@ The testdata for CRISPRnano is available at our test sample at https://iufduesse
 |-|-|-|-|-|-|
 |Linux|	Ubuntu 20.04|Version 99.0.4844.51|98.0|n/a|n/a|
 |MacOS|Monterey|Version 99.0.4844.51|98.0|n/a|15.3|
-|Windows 10|Version 99.0.4844.51|98.0|99.0.115039|n/a|
+|Windows 10|Version 99.0.4844.51|98.0|99.0.115039|n/a|n/a|
 
