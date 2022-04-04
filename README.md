@@ -27,9 +27,9 @@ The source code for CRISPRnano is available at https://github.com/thachnguyen/CR
 The testdata for CRISPRnano is available at our test sample at https://iufduesseldorf-my.sharepoint.com/:u:/g/personal/thach_nguyen_iuf-duesseldorf_de/ER4kM3RQaRJLiltUCpcT2iMBiEvGvs3u2NiDTdtSPBLE1Q?e=8FEAJc.
 
 ## Browser compatibility
-|OS Version|Chrome|Firefox|Microsoft Edge|Safari|
-|-|-|-|-|-|
-|Linux|	Ubuntu 20.04|Version 99.0.4844.51|98.0|n/a|n/a
-|MacOS|Monterey|Version 99.0.4844.51|98.0|n/a|15.3
-|Windows 10|Version 99.0.4844.51|98.0|99.0.115039|n/a
+|OS| Version|Chrome|Firefox|Microsoft Edge|Safari|
+|-|-|-|-|-|-|
+|Linux|	Ubuntu 20.04|Version 99.0.4844.51|98.0|n/a|n/a|
+|MacOS|Monterey|Version 99.0.4844.51|98.0|n/a|15.3|
+|Windows 10|Version 99.0.4844.51|98.0|99.0.115039|n/a|
 
