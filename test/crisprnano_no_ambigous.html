@@ -1,0 +1,1656 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><meta http-equiv="Content-Script-Type" content="text/javascript">
+    <script language="JavaScript" src="" ></script>
+    <style>
+        h1{
+        color:rgba(22, 4, 41, 0.932);
+        padding:0;
+        font-family:Baskerville, "Palatino Linotype", Palatino, "Century Schoolbook L", "Arial", sans-serif;
+        font-size:30px;
+        }
+        .column {
+        float: left;
+        width: 50%;
+        }
+        .input_form {
+        border-radius: 6px;
+        border: 2px solid #0c0c0c;
+        }
+        .top_menu {
+        border-radius: 10px;
+        border: 2px solid #0c0c0c;
+        }
+        .button {
+        background-color: #7dbfe0; 
+        border: 2px solid #0c0c0c;
+        border-radius: 10px;
+        color: rgb(8, 8, 8);
+        padding: 10px 22px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        margin: 4px 2px;
+        cursor: pointer;
+        }
+
+        /* Popup container - can be anything you want */
+.popup {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* The actual popup */
+.popup .popuptext {
+  visibility: hidden;
+  width: 460px;
+  background-color: rgb(110, 110, 110);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -80px;
+}
+
+/* Popup arrow */
+.popup .popuptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Toggle this class - hide and show the popup */
+.popup .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+  from {opacity: 0;} 
+  to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}
+
+    </style>
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+        <title>CrispNano</title>
+        </head>
+        <h1 style="margin:10px 10;">Identification of genome edited cells </h1>
+        <!-- <body background="./main_files/theme.jpg" style="background-attachment: fixed; font-family: Helvetica; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body> -->
+        <body background="" style="background-attachment: fixed; font-family: sans-serif; font-weight: 100; overflow-x: hidden; display: block;" ondrop="FileDrop(event);" data-new-gr-c-s-check-loaded="14.1035.0" data-gr-ext-installed=""></body>
+        <br>
+         <div id="save" style="display:none">test</div>
+            <div id="setup" style="position:absolute; left:20px; top:80px">
+                <br>
+                <br>
+                <div class="column">
+                FASTQ Files (*): 
+                <div class="popup" onclick="myFunction1()">(? Click here!)
+                    <span class="popuptext" id="help1">FASTQ output files from Illumina or ONT. We recommend file's size smaller than 200MB. Make sure that the correct ordering is applied in the file browser. The file allocation to individual pie charts can be verified by the numbers given at alignment track. Click again to close.</span>
+                </div>
+                    <br><input type="file" id="files" class="input_form" name="files[]" multiple=""><br>
+                </div>
+                <div class="column">
+                    Barcode Files (Beta version): 
+                    <div class="popup" onclick="myFunction2()">(? Click here!)
+                        <span class="popuptext" id="help2">Still testing, Not in this release yet. Click again to close.</span>
+                        <!-- Your input barcode files your CRISPR experiment data, make sure that the correct ordering of barcode. The file must be in fasta format by the numbers given below the output pie charts -->
+                    </div>
+                    <br><input type="file" id="barcode_files" class="input_form" name="files[]" multiple=""> <br>
+                </div>
+                <a href="https://iufduesseldorf-my.sharepoint.com/:u:/g/personal/thach_nguyen_iuf-duesseldorf_de/ER4kM3RQaRJLiltUCpcT2iMBiEvGvs3u2NiDTdtSPBLE1Q?e=8FEAJc">(Our test sample)</a><br>
+                
+                <br>Reference Sequence (*):                 
+                <div class="popup" onclick="myFunction3()">(? Click here!)
+                    <span class="popuptext" id="help3">Reference amplicon length should be in the range of 200-300 bases with the nuclease target site located roughly in the middle. You can get the reference from Ensembl link below. Click again to close</span>
+                </div>              
+                <br><input type="text" class="input_form" size="65" name="Locus" value="GAGCCCACCCCCAGGCCCTGCCACTCACCTCTCCACACTGTTGTGGTGGATGCAGCCGTGGGAGCCGCCGACGGCATAGATGTGGCCATCGATGACCCCCACCCCGATGCGGTTACGGGGCACGCTCATGGGGGCGCAGGGCGACCACTGATTGGTCATGGGGTTGT"> 
+                <br>              
+                <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/">(Ensembl reference)</a><br>
+                
+                <br>Nuclease Target Site (*): 
+                <div class="popup" onclick="myFunction4()">(? Click here!)
+                    <span class="popuptext" id="help4">In this field the nuclease target site is entered. The sequence has to be in the same orientation as the reference sequence above. Click again to close</span>
+                </div>
+                <br><input type="text" class="input_form" size="40" name="RightBS" value="CCGTGGGAGCCGCCGACGG"><br>
+                
+                <div class="column">
+                <br>Interested region (optional) +/- bp: 
+                <div class="popup" onclick="myFunction5()">(? Click here!)
+                    <span class="popuptext" id="help5"> For ONT reads, it is recommended to use -/+15 bases around the predicted DNA lesion. Larger regions are prone to false positive indels. Larger regions (total of 200-250 bp) can be safely used with Illumina reads. You can drag and drop the central point of the predicted double strand break in the genomic sequence to the left or to the right. Default 0 is double strand breaking point. Click again to close</span>
+                </div>
+                <br><input type="text" size="20" name="region_analyse" value="20" class="input_form" ><br>
+                   <br> 
+                </div> 
+                <div class="column">
+                    <p>(Advanced) Drag the slider to the left or right to change the interested region</p>
+                <div class="slidecontainer">
+                    <input type="range" min="-30" max="30" value="0" class="slider" id="myRange" oninput="this.nextElementSibling.value = this.value">
+                    <p>Offset w.r.t DSP: <span id="offset_var"></span> 
+                        <div class="popup" onclick="myFunction6()">(? Click here!)
+                            <span class="popuptext" id="help6">You can shift the centre of interest region with respect to the double strand breakpoint (DSB) to the left or right. Default value is double strand breaking point 0. Click to close</span>
+                        </div>
+                    </p>
+                    <br> <br><br>
+                  </div>
+                </div> 
+
+                <br>Targeting mutagenesis oligonucleotide (optional): 
+                <div class="popup" onclick="myFunction7()">(? Click here!)
+                    <span class="popuptext" id="help7">Donor oligonucleotide sequence used to introduce a site specific genomic modification. The sequence entered should be in the same orientation as the amplicon sequence. Click again to close.</span>
+                </div>
+                <br><input type="text" class="input_form" size="40" name="TargetingOligo" value=""><br>
+                                <br>Gene Name (optional):
+                <div class="popup" onclick="myFunction8()">(? Click here!)
+                    <span class="popuptext" id="help8">Name of the study gene. Automatic query from genename is not implemented yet. Click to close.</span>
+                </div> 
+                <br><input type="text" class="input_form" size="40" name="GeneName" value="KEAP1"><br>
+                <br>Indel Threshold [%]: 
+                <div class="popup" onclick="myFunction9()">(? Click here!)
+                    <span class="popuptext" id="help9">The Indel Threshold determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. Low threshold values can result in false positive allele calling due to sequencing errors, whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered. We recommend to use 5% for ONT reads and 2% for Illumina reads (default is set to 5%). Click again to close.</span>
+                </div> 
+                <br><input type="text" size="20" class="input_form" name="MutationThreshold" VALUE="5"></input><br> <br>
+
+                <a style="font-style: italic;">
+                    CRISPRnano website is free and open to all users and there is no login required.<br>
+                    To use CRISPRnano, you must enable JavaScript on your web browser.<br>
+                    If you want to use CRISPRnano offline, please download <a href="https://iufduesseldorf-my.sharepoint.com/:u:/g/personal/thach_nguyen_iuf-duesseldorf_de/EeZRZlyFP31Gu-s-w57wlfEB42anCiwxbXRms_U_GAekpQ?e=YxlI2v"> the offline html file here.</a> <br>
+            
+                    <br></a>
+                <a style="font-style: italic;"> (*) Mandatory field </a>
+                <br>
+               
+                <button class='button' onclick="Start();">SUBMIT</button>
+                <br><br>
+                <output id="list"></output>
+                <br>
+            </div>
+        
+            <div id="about" style="position: absolute; left: 20px; top: 120px; width: 70%; display: none;">
+                <br>
+                <br>
+                <b>About:</b>
+                <br>
+                <br>CRISPRnano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones.  
+                CRISPRnano supports noisy Oxford Nanopore but also Next Generation Sequencing (NGS) reads such as Illumina and PacBio or Sanger Sequencing. <br> <br>
+
+                CRISPRnano was developed by Dr. Thach Nguyen in the group of Dr. Andrea Rossi (GEMD lab) at Leibniz Research Institute for Environmental Medicine. The template web interface, data input, output are developped based on the template of Outknocker http://www.outknocker.org/. 
+                <br>
+                <br>
+                <br><b>Licence:</b>
+                <br>
+                <br>CRISPRnano can be redistributed and/or modified under the terms of the GNU General Public License (Version 2), as published by the Free Software Foundation. A copy of the license can be found online at www.gnu.org/licenses. CRISPRnano is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.                <br>
+                <br><b>Citing CRISPRnano:</b>
+                <br>
+                <br>
+                <br>We kindly request that use of this software be cited in publications as:<br>
+                Identification of genome edited cells using CRISPRnano (2022). 
+                <br>   
+              <br><br>
+            </li></div>
+
+            <div id="manual" style="position: absolute; left: 20px; top: 120px; width: 70%; display: none;">
+                <br>
+                <br>
+                <h3>CRISPRnano manual</h3>
+                CRISPRnano is a javascript-based program that was developed for rapid deep sequencing based genotyping of nuclease edited cell clones. CRISPRnano supports noisy Oxford Nanopore but also Next Generation Sequencing (NGS) reads such as Illumina, PacBio, or classic Sanger Sequencing.<br><br>
+                <b>Input data:</b>
+                <br>
+                <br>CRISPRnano analyzes FASTQ output files from ONT, NGS, or Sanger systems.
+                CRISPRnano webserver analyzes multiple samples and supports up to 96 FASTQ files at the time.
+                We recommend a file's size smaller than 200MB. Please, make sure that the correct ordering is applied in the file browser.
+                The file allocation to individual pie charts can be verified by the numbers given at alignment track.
+                Our data contains multiple small FASTQ files.  FASTQ files can be concatenated using command <b>cat</b> under Linux or <b>type</b> under Windows environment.<br>
+                On Linux terminal:<br>
+                $ cat /path/to/fastq/files/*.fastq > /your/new/location/output.fastq<br><br>
+                On Window command prompt (path symbol is different):<br>
+                $ type \path\to\fastq\files\*.fastq> \your\new\location\output.fastq<br>
+                
+                <br>
+                <b>Reference sequences</b> 
+                <br>
+                Reference amplicon length should be in the range of 200-350 bases (based on your library preparation), with the nuclease target site located roughly in the middle. The reference sequence of your gene of interest can be retrieved from <a href="http://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/"> Ensembl database</a>. <br><br>
+
+                <b>Nuclease Target Site</b> 
+                <br>
+                The Nuclease Target Site sequence (CRISPR, TALEN, ZINC-Finger, etc.) has to be in the same orientation as the reference sequence above. The Nuclease Target Site is briefly checked if it is contained in Reference genome<br><br>
+                
+                <b>Interested region and Offset centre</b> 
+                <br>
+                For ONT reads, it is recommended to use -/+15 bases around the predicted DNA lesion. Larger regions are prone to false positive indels. 
+                Larger regions (total of 200-250 bp) can be safely used with Illumina reads. You can drag and drop the central point of the predicted double strand break in the genomic sequence to the left or to the right. Default 0 is double strand breaking point.<br><br>
+                
+                <b>Targeting mutagenesis oligonucleotide</b> 
+                <br>
+                Donor oligonucleotide sequence is used to introduce a site specific genomic modification. 
+                The sequence entered should be in the same orientation as the amplicon sequence. <br><br>
+                <b>Indel Threshold</b> 
+                <br>
+                The Indel Threshold percentage determines at what relative occurrence an individual indel mutation is considered as a unique allele of the respective clone analyzed, and is thus displayed in the alignment list. 
+                Low threshold values can result in false positive allele calling due to sequencing errors, 
+                whereas high threshold values result in false negative allele calling. Values in between 0 - 100 % can be entered. We recommend using 5% for ONT reads and 2% for Illumina reads (the default is set to 5%).  <br><br>
+                
+                <b>Code Availability </b> 
+                <br>
+                The source code for CRISPRnano is available at <a href="https://github.com/thachnguyen/CRISPRnano">https://github.com/thachnguyen/CRISPRnano</a> <br><br>
+                
+                <b>Test data </b> 
+                <br>
+                The testdata for CRISPRnano is available at <a href="https://iufduesseldorf-my.sharepoint.com/:u:/g/personal/thach_nguyen_iuf-duesseldorf_de/ER4kM3RQaRJLiltUCpcT2iMBiEvGvs3u2NiDTdtSPBLE1Q?e=8FEAJc">our test sample.</a><br><br>
+                <b>
+                    Browser compatibility
+                </b>
+                <table style="width:100%">
+                    <tr>
+                        <td>OS</td>
+                        <td>Version</td>
+                        <td>Chrome</td>
+                        <td>Firefox</td>
+                        <td>Microsoft Edge</td>
+                        <td>Safari</td>
+                    </tr>
+                    <tr>
+                        <td>Linux</td>
+                        <td>Ubuntu 20.04</td>
+                        <td>Version 99.0.4844.51</td>
+                        <td>98.0</td>
+                        <td>n/a</td>
+                        <td>n/a</td>
+                    </tr>
+                    <tr>
+                        <td>MacOS</td>
+                        <td>Monterey</td>
+                        <td>Version 99.0.4844.51</td>
+                        <td>98.0</td>
+                        <td>n/a</td>
+                        <td>15.3 </td>
+                    </tr>
+                    <tr>
+                        <td>Windows</td>
+                        <td>10</td>
+                        <td>Version 99.0.4844.51</td>
+                        <td>98.0</td>
+                        <td>99.0.115039</td>
+                        <td>n/a</td>
+                    </tr>
+                  </table>
+                
+            </div>
+
+            <div id="results" style="position: absolute; left: 20px; top: 160px; display: none;">
+                <div id="DIV_piecharts">
+                    <svg id="SVGpie" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="900" height="520">
+                    </svg>
+                </div>
+                <div id="DIV_alignment">
+                    <svg id="SVGmut" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1300" height="5000">
+                    </svg>
+                </div>
+                <div style="position:absolute; right:10%; top:0%" id="restart" align="right">
+                    <button onclick="SaveSVG();">Save pie charts (.svg)</button>
+                    <br>
+                    <br><button onclick="PrintSVG();">Print pie charts (.pdf)</button>
+                    <br>
+                    <br><button onclick="SaveSVGAlignment();">Save alignment (.svg)</button>
+                    <br>
+                    <br><button onclick="PrintSVGAlignment();">Print alignment (.pdf)</button>
+                    <br>
+                    <!-- <br><button onclick="SaveTable();">Save mutation statistics (.txt)</button> -->
+                </div>
+            </div>
+
+            <div id="progress" style="display:none; padding: 10px; border: 10px solid #CCC; background: #EEE; width:20%; position:absolute; top:50%;left:30%">
+            </div>
+
+            <div id="DIV_topmenu" style="position:absolute; top:30; left:0; height:7%; width:100%">
+                <svg id="SVG_topmenu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" onmousedown="return false;">
+                <rect fill="rgb(50,42,126)" x="20" y="20" width="240" height="20" opacity="0.9" onmouseover="evt.target.setAttribute(&#39;opacity&#39;,&#39;0.8&#39;);" 
+                onmouseout="evt.target.setAttribute(&#39;opacity&#39;,&#39;0.9&#39;);" onclick="TabClicked(0);"></rect><text font-family="sans-serif" font-weight="100" font-size="13" x="30" y="35" onclick="TabClicked(0);" pointer-events="none" style="fill: rgb(255, 255, 255);">Setup</text>
+                <rect fill="rgb(16,115,179)" x="270" y="20" width="240" height="20" opacity="0.9" onmouseover="evt.target.setAttribute(&#39;opacity&#39;,&#39;0.8&#39;);" onmouseout="evt.target.setAttribute(&#39;opacity&#39;,&#39;0.9&#39;);" onclick="TabClicked(1);"></rect><text font-family="sans-serif" font-weight="100" font-size="13" x="280" y="35" onclick="TabClicked(1);" pointer-events="none" style="fill: rgb(255, 255, 255);">Results</text><rect fill="rgb(38,170,220)" x="520" y="20" width="240" height="20" opacity="0.9" onmouseover="evt.target.setAttribute(&#39;opacity&#39;,&#39;0.8&#39;);" onmouseout="evt.target.setAttribute(&#39;opacity&#39;,&#39;0.9&#39;);" onclick="TabClicked(2);"></rect></svg>
+            </div>
+              </div>
+    <script>
+        // Alignment algorithms
+        // modified version of Smith Watermann algorithm 
+        // This program use some API from implementation by Prof Heng Li at https://github.com/lh3/bioseq-js
+        /**
+         * Encode a sequence string with table
+         * @param seq    sequence
+         * @param table  encoding table; must be of size 256
+         *
+         * @return an integer array
+         */
+        function bsg_enc_seq(seq, table)
+        {
+            if (table == null) return null;
+            var s = [];
+            s.length = seq.length;
+            for (var i = 0; i < seq.length; ++i)
+                s[i] = table[seq.charCodeAt(i)];
+            return s;
+        }
+
+        /**
+         * Generate scoring matrix from match/mismatch score
+         *
+         * @param n     size of the alphabet
+         * @param a     match score, positive
+         * @param b     mismatch score, negative
+         *
+         * @return sqaure scoring matrix. The last row and column are zero, for
+         * matching an ambiguous residue.
+         */
+        function bsa_gen_score_matrix(n, a, b)
+        {
+            var m = [];
+            if (b > 0) b = -b; // mismatch score b should be non-positive
+            for (var i = 0; i < n - 1; ++i) {
+                m[i] = [];
+                for (var j = 0; j < n - 1; ++j)
+                    m[i][j] = i == j? a : b;
+                m[i][j] = 0;
+            }
+            m[n-1] = [];
+            for (var j = 0; j < n; ++j) m[n-1][j] = 0;
+            return m;
+        }
+        /**
+         * Generate query profile (a preprocessing step)
+         *
+         * @param _s      sequence in string or post bsg_enc_seq()
+         * @param _m      score matrix or [match,mismatch] array
+         * @param table   encoding table; must be consistent with _s and _m
+         *
+         * @return query profile. It is a two-dimensional integer matrix.
+         */
+        function bsa_gen_query_profile(_s, _m, table)
+        {
+            var s = typeof _s == 'string'? bsg_enc_seq(_s, table) : _s;
+            var qp = [], matrix;
+            if (_m.length >= 2 && typeof _m[0] == 'number' && typeof _m[1] == 'number') { // match/mismatch score
+                if (table == null) return null;
+                var n = typeof table == 'number'? table : table[table.length-1] + 1;
+                matrix = bsa_gen_score_matrix(n, _m[0], _m[1]);
+            } else matrix = _m; // _m is already a matrix; FIXME: check if it is really a square matrix!
+            for (var j = 0; j < matrix.length; ++j) {
+                var qpj, mj = matrix[j];
+                qpj = qp[j] = [];
+                for (var i = 0; i < s.length; ++i)
+                    qpj[i] = mj[s[i]];
+            }
+            return qp;
+        }
+
+        /**
+         * Local pairwise alignemnt
+         *
+         * @param is_local  perform local alignment
+         * @param target    target string
+         * @param query     query string or query profile
+         * @param matrix    square score matrix or [match,mismatch] array
+         * @param gapsc     [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext*k
+         * @param w         bandwidth, disabled by default
+         * @param table     encoding table. It defaults to bst_nt5.
+         *
+         * @return [score,target_start,cigar]. cigar is encoded in the BAM way, where
+         * higher 28 bits keeps the length and lower 4 bits the operation in order of
+         * "MIDNSH".
+         */
+        function bsa_align(is_local, target, query, matrix, gapsc, w, table)
+        {
+            // convert bases to integers
+            if (table == null) table = bst_nt5;
+            var t = bsg_enc_seq(target, table);
+            var qp = bsa_gen_query_profile(query, matrix, table);
+            var qlen = qp[0].length;
+
+            // adjust band width
+            var max_len = qlen > t.length? qlen : t.length;
+            w = w == null || w < 0? max_len : w;
+            var len_diff = t.target > qlen? t.target - qlen : qlen - t.target;
+            w = w > len_diff? w : len_diff;
+            
+            // set gap score
+            var gapo, gape; // these are penalties which should be non-negative
+            if (typeof gapsc == 'number') gapo = 0, gape = gapsc > 0? gapsc : -gapsc;
+            else gapo = gapsc[0] > 0? gapsc[0] : -gapsc[0], gape = gapsc[1] > 0? gapsc[1] : -gapsc[1];
+            var gapoe = gapo + gape; // penalty for opening the first gap
+
+            // initial values
+            var NEG_INF = -0x40000000;
+            var H = [], E = [], z = [], score, max = 0, end_i = -1, end_j = -1;
+            if (is_local) {
+                for (var j = 0; j <= qlen; ++j) H[j] = E[j] = 0;
+            } 
+
+            // the DP loop
+            for (var i = 0; i < t.length; ++i) {
+                var h1 = 0, f = 0, m = 0, mj = -1;
+                var zi, qpi = qp[t[i]];
+                zi = z[i] = [];
+                var beg = i > w? i - w : 0;
+                var end = i + w + 1 < qlen? i + w + 1 : qlen; // only loop through [beg,end) of the query sequence
+
+                for (var j = beg; j < end; ++j) {
+                    // At the beginning of the loop: h=H[j]=H(i-1,j-1), e=E[j]=E(i,j), f=F(i,j) and h1=H(i,j-1)
+                    // If we only want to compute the max score, delete all lines involving direction "d".
+                    var e = E[j], h = H[j], d;
+                    H[j] = h1;           // set H(i,j-1) for the next row
+                    h += qpi[j];         // h = H(i-1,j-1) + S(i,j)
+                    d = h >= e? 0 : 1;
+                    h = h >= e? h : e;
+                    d = h >= f? d : 2;
+                    h = h >= f? h : f;    // h = H(i,j) = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}
+                    d = !is_local || h > 0? d : 1<<6;
+                    h1 = h;              // save H(i,j) to h1 for the next column
+                    mj = m > h? mj : j;
+                    m = m > h? m : h;    // update the max score in this row
+                    h -= gapoe;
+                    h = !is_local || h > 0? h : 0;
+                    e -= gape;
+                    d |= e > h? 1<<2 : 0;
+                    e = e > h? e : h;    // e = E(i+1,j)
+                    E[j] = e;            // save E(i+1,j) for the next row
+                    f -= gape;
+                    d |= f > h? 2<<4 : 0;
+                    f = f > h? f : h;    // f = F(i,j+1)
+                    zi[j] = d;           // z[i,j] keeps h for the current cell and e/f for the next cell
+                }
+                H[end] = h1, E[end] = is_local? 0 : NEG_INF;
+                if (m > max) max = m, end_i = i, end_j = mj;
+            }
+            if (is_local && max == 0) return null;
+            score = is_local? max : H[qlen];
+
+            // backtrack to recover the alignment/cigar
+            function push_cigar(ci, op, len) {
+                if (ci.length == 0 || op != (ci[ci.length-1]&0xf))
+                    ci.push(len<<4|op);
+                else ci[ci.length-1] += len<<4;
+            }
+            var cigar = [], tmp, which = 0, i, k, start_i = 0;
+            if (is_local) {
+                i = end_i, k = end_j;
+                if (end_j != qlen - 1) // then add soft cliping
+                    push_cigar(cigar, 4, qlen - 1 - end_j);
+            } else i = t.length - 1, k = (i + w + 1 < qlen? i + w + 1 : qlen) - 1; // (i,k) points to the last cell
+            while (i >= 0 && k >= 0) {
+                tmp = z[i][k - (i > w? i - w : 0)];
+                which = tmp >> (which << 1) & 3;
+                if (which == 0 && tmp>>6) break;
+                if (which == 0) which = tmp & 3;
+                if (which == 0)      { push_cigar(cigar, 0, 1); --i, --k; } // match
+                else if (which == 1) { push_cigar(cigar, 2, 1); --i; } // deletion
+                else                 { push_cigar(cigar, 1, 1), --k; } // insertion
+            }
+            if (is_local) {
+                if (k >= 0) push_cigar(cigar, 4, k + 1); // add soft clipping
+                start_i = i + 1;
+            } 
+            for (var i = 0; i < cigar.length>>1; ++i) // reverse CIGAR
+                tmp = cigar[i], cigar[i] = cigar[cigar.length-1-i], cigar[cigar.length-1-i] = tmp;
+            return [score, start_i, cigar];
+        }
+
+        // generate cigar to gap in breakpoint windows, bkp11, bkp22 is offset interest region of ref wrt gap add-in ref 
+        function bsa_cigar2gaps_breakpoint(target, query, start, cigar, bkp1, bkp2)
+        {
+            var oq = '', ot = '', mid = '', oq1 = '', lq = 0, lt = start;
+            var bkp11 = bkp1;
+            var bkp22 = bkp2;
+            var aln_type = 0;
+            var gap_len = 0;
+            for (var k = 0; k < cigar.length; ++k) {
+                var op = cigar[k]&0xf, len = cigar[k]>>4;
+                //var len1 = Math.floor(len/3)
+                //update breakpoints only, no update aln_type
+                // first check the alignment start point position
+                if (start > bkp11){
+                    aln_type=0;
+                    continue;
+                } 
+                else if (lt + len <= bkp11){
+                    if (op == 0) { // match
+                        oq += query.substr(lq, len);
+                        ot += target.substr(lt, len);
+                        oq1 += Array(len).fill('\xa0').join('');
+                        lq += len, lt += len;
+                    } else if (op == 1) { // insertion (only update bkp11, 22 for insertion in reference sequence)
+                        oq1 += query.substr(lq, len);
+                        lq += len;
+                        bkp11 += len
+                        bkp22 += len
+                    } else if (op == 2) { // deletion
+                        oq += Array(len+1).join("-");
+                        ot += target.substr(lt, len);
+                        lt += len;
+                        oq1 += Array(len).fill('\xa0').join('');
+                    } else if (op == 4) { // soft clip
+                        lq += len;
+                    }
+                }
+                // update aln_type ONE time, otherwise assign 'ambigous read' 
+                else if (bkp22 >= lt+len){
+                    if (op == 0) { // match ! ONLY UPDATE ONCE
+                        oq += query.substr(lq, len);
+                        ot += target.substr(lt, len);
+                        oq1 += Array(len).fill('\xa0').join('');
+                        lq += len, lt += len;
+                        if (aln_type==0){
+                            aln_type = 1;
+                        }
+                    } else if ((op == 1)||(op == 2)) { // Combine indels
+                        gap_len = len;
+                        if (op == 1) {
+                            oq1 += query.substr(lq, len);
+                            lq += len;
+                        }
+                        else if (op == 2){
+                            ot += target.substr(lt, len);
+                            oq1 += Array(len).fill('\xa0').join('');
+                            oq += Array(len+1).join("-");
+                            lt += len;
+                        } 
+                        
+                        if (len%3 == 0){
+                            //check previous state
+                            if ((aln_type==0)||(aln_type==1)){
+                                aln_type =2;
+                            }
+                            else {
+                                // if aln_type already indel so it 's ambigious
+                                aln_type = 8  // ambigous
+                            }     
+                        }
+                        else{
+                            if ((aln_type==0)||(aln_type==1)){
+                                aln_type =3;
+                            }
+                            else {
+                                aln_type = 8  // ambigous
+                            }
+                        }
+                    } 
+                    else if (op == 4) { // soft clip
+                        lq += len;
+                    }
+                }
+                else {   // bk point cover single windows
+                    if (op == 0) { // match
+                        oq += query.substr(lq, len);
+                        ot += target.substr(lt, len);
+                        oq1 += Array(len).fill('\xa0').join('');
+                        lq += len, lt += len;
+                        if (aln_type==0){
+                            aln_type = 1 //no indel
+                        }
+                    } else if ((op == 1)||(op == 2)) { // indel
+                        if (op == 1) {
+                            oq1 += query.substr(lq, len);
+                        }
+                        else if (op == 2){
+                            ot += target.substr(lt, len);
+                            oq1 += Array(len).fill('\xa0').join('');
+                            oq += Array(len+1).join("-");
+                        }  
+                        lq += len;
+                        if (len%3 == 0){
+                            if (aln_type==0){
+                                aln_type =2;
+                                }
+                        } else{
+                            if (aln_type==0){
+                                aln_type =3;
+                            }
+                        }
+                        
+                    } 
+                    else if (op == 4) { // soft clip
+                        lq += len;
+                    }
+                }    
+            }
+            var ut = ot.toUpperCase();
+            var uq = oq.toUpperCase();
+            for (var k = 0; k < ut.length; ++k)
+                mid += ut.charAt(k) == uq.charAt(k)? '|' : ' ';
+            return [[oq.substr(bkp1-start, bkp2-bkp1), oq1.substr(bkp1-start, bkp2-bkp1)], aln_type, gap_len];
+        }
+
+        var bst_nt5 = [
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+            4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4
+        ];
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("offset_var");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function() {
+        output.innerHTML = this.value;
+        }
+
+        //Top Menu:
+        var SVGtab = new Array(10), SVGtabtext = new Array(10);
+        var tabtextcontent = ["GENOME EDITTING ANALYZER", "RESULTS", "MANUAL & DOCUMENT", "ABOUT CRISPRnano"];
+        var BLAU=["rgb(0, 0, 0)","rgb(221,0,0)","rgb(255,206,0)"];
+        function GenerateTopMenu()
+        {
+            var svg = document.getElementById("SVG_topmenu");
+            svg.setAttributeNS(null, "onmousedown", "return false;");
+            var NS="http://www.w3.org/2000/svg";
+
+            for (var i=0; i<4; i++) {
+                SVGtab[i] = document.createElementNS(NS,"rect");
+                svg.appendChild(SVGtab[i]);
+                SVGtab[i].setAttribute("fill", BLAU[i%3]);
+                SVGtab[i].setAttribute("x", 20+i*250);
+                SVGtab[i].setAttribute("y",20);
+                SVGtab[i].setAttribute("width", 240);
+                SVGtab[i].setAttribute("height", 20);
+                // SVGtab[i].style.setAttribute("border-radius", 20);
+
+                SVGtab[i].setAttribute('opacity','0.9');
+                SVGtab[i].setAttributeNS(null, "onmouseover", "evt.target.setAttribute('opacity','0.8');");
+                SVGtab[i].setAttributeNS(null, "onmouseout",  "evt.target.setAttribute('opacity','0.9');");
+                SVGtab[i].setAttributeNS(null, "onclick","TabClicked("+i+");");
+                SVGtabtext[i] = document.createElementNS(NS,"text");
+                SVGtabtext[i].setAttribute("font-family", "sans-serif");
+                SVGtabtext[i].setAttribute("font-weight", "100");
+                SVGtabtext[i].setAttribute("font-size", "13");
+                SVGtabtext[i].setAttribute("x", 30+i*250);
+                SVGtabtext[i].setAttribute("y", 35);
+                SVGtabtext[i].style.fill="rgb(255,255,255)";
+                SVGtabtext[i].textContent = tabtextcontent[i];
+                SVGtabtext[i].setAttributeNS(null, "onclick","TabClicked("+i+");");
+                SVGtabtext[i].setAttribute("pointer-events","none");
+                svg.appendChild(SVGtabtext[i]);
+            }
+        }
+        var currenttab = 0;
+        function TabClicked(i)
+        {
+            if (i==0) document.getElementById("setup").style.display = "";
+            else document.getElementById("setup").style.display = "none";
+
+            if (i==1) document.getElementById("results").style.display = "";
+            else document.getElementById("results").style.display = "none";
+
+            if (i==2) document.getElementById("manual").style.display = "";
+            else document.getElementById("manual").style.display = "none";
+
+            if (i==3) document.getElementById("about").style.display = "";
+            else document.getElementById("about").style.display = "none";
+
+            document.getElementById("progress").style.display = "none";
+
+            currenttab = i;
+        }
+        GenerateTopMenu();
+        TabClicked(0);
+        
+        var RightBsPos=0, RightBsLen=0;
+        var hits = Array(96);
+        //raw aligned dictionary
+        aln_dict = Array(96);
+        //filtered aligned dictionary
+        aln_dict_fil = Array(96)
+        aln_type_dict = Array(96)
+
+        for (var i=0; i<96; i++) {
+            hits[i] = Array(1000000);
+            aln_dict[i] = {}
+            aln_dict_fil[i] = {}
+            aln_type_dict[i] = {}
+            for (var ii=0; ii<1000000; ii++) {
+                hits[i][ii] = -1;
+            }
+        }
+    
+        var AlignmentPrecalc = new Array(96);
+        var locus, locuslen;
+        var files;
+        var reader;
+        var CurrentFileId, CurrentFileChunk;
+        var MutationThreshold = 0
+        var BreakPoint;
+        var offset_DSB = 0;
+        var rightbs;
+        var aln_tracks = Array(96);
+        var aln_loc_seq = Array(96)
+        for (var i=0; i<96; i++) {
+            aln_tracks[i] = ''
+        }
+        // indel location and seq
+        var aln_loc_seq = Array(96)
+        for (var i=0; i<96; i++) {
+            aln_loc_seq[i] = Array(1000000);
+            for (var ii=0; ii<1000000; ii++) {
+                aln_loc_seq[i][ii] = '';
+            }
+        }
+        //summary track
+        var sum_track = Array(96)
+        var summary_track = Array(96)
+        for (var i=0; i<96; i++){
+            sum_track[i] = 0;
+            summary_track[i] = Array(8); 
+        }
+
+        //reverse comp function
+        function ReverseComplement(A)
+        {
+            var dummy = "";
+            for (var i=0; i<A.length; i++) {
+                if (A[A.length-1-i] == 'G') dummy += 'C';
+                if (A[A.length-1-i] == 'A') dummy += 'T';
+                if (A[A.length-1-i] == 'T') dummy += 'A';
+                if (A[A.length-1-i] == 'C') dummy += 'G';
+            }
+            return dummy;
+        }
+
+        function Start()
+        {
+            document.getElementById("progress").style.display = '';
+            locus = document.getElementsByName("Locus")[0].value.toUpperCase(); //reference sequence
+            locuslen = locus.length; 
+            rightbs = document.getElementsByName("RightBS")[0].value.toUpperCase(); // sgRNA seq  
+            RightBsLen = rightbs.length;
+
+            MutationThreshold = document.getElementsByName("MutationThreshold")[0].value;
+            offset_DSB = slider.value;
+            region_analyse = document.getElementsByName("region_analyse")[0].value;
+
+            //Find Target site in the wild type sequence:
+            if (RightBsLen == 0){
+                alert("No target site was entered. Please enter a valid sequence");
+                return;
+            }
+            RightBsPos = locus.search(rightbs);
+            if (RightBsPos == -1) {
+                RightBsPos = locus.search(ReverseComplement(rightbs));
+                if (RightBsPos == -1) {
+                    alert("The target site was not found in the reference sequence. Please enter a valid sequence");
+                    return;
+                } else {
+                    alert("The sgRNA was reverse, please enter a reverse sequence sgRNA");
+                }
+            }
+            //breaking point on locus 
+            BreakPoint = RightBsPos + RightBsLen + offset_DSB*1     
+            // Test keap1: BreakPoint == 283
+        
+            var evt = document.getElementById('files');
+            files = evt.files;
+
+            if (files.length <= 0) {
+                alert("No files were specified. Please upload your fastq files");
+                return;
+            }
+            CurrentFileId = 0;
+            CurrentFileChunk = 0;
+            ReadNextFileChunk();
+        }
+
+        var RestFromLastChunk = "";
+        var chunksize = 20240*10240;
+        var chunksize1 = 1024*1024;
+
+        function FileReceived()
+        {
+            var original = RestFromLastChunk+reader.result;
+            var cursor = 0, origlen = original.length;
+            // alignment parameter for affine score DP algorithms 
+            var ms = 1 // match score
+            var mms = -2 //mismatch score
+            var gapo = -2  // gap open score
+            var gape = -1  // gap extent score
+            var is_local = true
+
+            var id = CurrentFileId;
+
+            var readnum = 0;
+            var str = ''
+            while (true) {
+                var cursor1 = cursor;
+                while (++cursor1<origlen && original[cursor1] != "\n");
+                var cursor2 = cursor1+1;
+                while (++cursor2<origlen && original[cursor2] != "\n");
+                var cursor3 = cursor2+1;
+                while (++cursor3<origlen && original[cursor3] != "\n");
+                var cursor4 = cursor3+1;
+                while (++cursor4<origlen && original[cursor4] != "\n");
+
+                if (cursor4 >= origlen) break;
+                else cursor = cursor4+1;
+
+                var read = original.slice(cursor1+1,cursor2);  
+                var readlen = read.length;
+                var aln_type;
+                var target = document.getElementsByName('Locus')[0].value.replace(/[\s\n]+/g, '')
+                var targetingOligo = document.getElementsByName("TargetingOligo")[0].value.toUpperCase(); //TargetingOligo
+                if ((targetingOligo !="") &&read.includes(targetingOligo)){
+                    aln_type = 7;
+                    hits[id][readnum] = aln_type
+                    var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
+                    var str1 = ''
+                    var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
+                    var fmt = fmt1[0]
+                                  
+                    str1 += fmt[0] + '\n';
+                    str1 += fmt[1] + '\n';
+                     
+                    if (aln_dict[id].hasOwnProperty(str1)){
+                        aln_dict[id][str1]+=1
+                    }
+                    else {
+                        aln_dict[id][str1] = 1
+                        aln_type_dict[id][str1] = aln_type
+                    }
+                    aln_tracks[id] +=str1
+                    hits[id][readnum] = aln_type
+                    readnum++;
+                } else { 
+                    var rst = bsa_align(is_local, target, read, [ms, mms], [gapo, gape]);
+                    var str1 = ''
+                    var fmt1 = bsa_cigar2gaps_breakpoint(target, read, rst[1], rst[2], BreakPoint-region_analyse*1, BreakPoint + region_analyse*1);
+                    var fmt = fmt1[0]
+                    aln_type = fmt1[1]
+                    str1 += fmt[0] + '\n';
+                    str1 += fmt[1] + '\n';
+                    //aggregate aln track into dictionary
+                    if (aln_type !=0){ 
+                        if (aln_dict[id].hasOwnProperty(str1)){
+                            aln_dict[id][str1]+=1
+                        }
+                        else {
+                            aln_dict[id][str1] = 1
+                            aln_type_dict[id][str1] = aln_type
+                        }
+                    }
+                    aln_tracks[id] +=str1
+                    hits[id][readnum] = aln_type
+                    readnum++;       
+                }
+            }
+            RestFromLastChunk = original.substr(cursor);
+            
+            //lines = "";
+            reader.result = "";
+            reader = "";
+
+            //load the next chunk of data:
+            CurrentFileChunk++;
+            if ((CurrentFileChunk)*chunksize >= files[CurrentFileId].size) //end of file -> next file
+            {
+                //compute number of aligned read
+                for (let key in aln_dict[id]){
+                    sum_track[id] += aln_dict[id][key];
+                }
+                for (let key in aln_dict[id]){
+                    if (aln_dict[id][key]> MutationThreshold*sum_track[id]/100){
+                        aln_dict_fil[id][key] = aln_dict[id][key];
+                    }
+                }
+                var not_align = 0;
+                var no_indel = 0; 
+                var inf_indel =  0;
+                var out_indel = 0;
+                var sum = 0;
+                var read_ambigous =0;
+                var targetingOligo = 0;
+                for (var i=0; i<1000000; i++){
+                    if (hits[id][i]>=0){
+                        switch (hits[id][i]){
+                            case 0:
+                                not_align++;
+                                break;
+                            case 1:
+                                no_indel++;
+                                sum++
+                                break;
+                            case 2:
+                                inf_indel++;
+                                sum++
+                                break;
+                            case 3: 
+                                out_indel++;
+                                sum++
+                                break;
+                            case 7: 
+                                targetingOligo++;
+                                sum++
+                                break;
+                            case 8: 
+                                read_ambigous++;
+                                sum++
+                                break;
+                        }
+                    }
+                }
+                var total_read = not_align + sum
+                summary_track[id][0] = total_read;
+                summary_track[id][1] = targetingOligo;
+                summary_track[id][2] = no_indel;
+                summary_track[id][3] = inf_indel;
+                summary_track[id][4] = out_indel;
+                summary_track[id][5] = read_ambigous;
+                summary_track[id][6] = not_align;
+                summary_track[id][7] = sum;
+        
+                PlotAlignment(id, locus)
+                CurrentFileChunk = 0;
+                RestFromLastChunk = "";
+                CurrentFileId++;
+                //id++;
+            }
+            if (CurrentFileId < files.length && CurrentFileId<96) {
+                setTimeout("ReadNextFileChunk();",10);
+            } else {
+                // for DEBUG
+                // document.getElementById('out').value = aln_tracks[0]
+                //document.getElementById('out').value = JSON.stringify(aln_dict_fil[0])
+                //document.getElementById('out').value = aln_tracks[0]
+                DrawPie();
+            }
+        }
+
+        function ReadNextFileChunk()
+        {
+            reader = new FileReader();
+            reader.onload = FileReceived;
+            reader.readAsText(files[CurrentFileId].slice(CurrentFileChunk*chunksize, (CurrentFileChunk+1)*chunksize));
+            //progress display:
+            // document.getElementById('progress').innerHTML = "File "+(CurrentFileId+1)+": "+Math.round(CurrentFileChunk*chunksize/1000000)+" MB processed";
+            document.getElementById('progress').innerHTML = "File "+(CurrentFileId+1)+":"+" processing. Please keep your web browser open"
+        }
+
+        function DrawPie()
+        {
+            var svg = document.getElementById("SVGpie");
+            var NS="http://www.w3.org/2000/svg";
+
+            TabClicked(1);
+
+            //reset svg:
+            while (svg.lastChild) svg.removeChild(svg.lastChild);
+
+            //register mouse listener:
+            svg.addEventListener("mousedown", PieClick, false);
+
+            var ROT= ["rgb(232,0,30)","rgb(255,102,0)","rgb(252,176,78)"]; 
+            var BLAU=["rgb(50,42,126)","rgb(16,115,179)","rgb(38,170,220)"];
+
+            var maxsum = 0;
+            for (var barcode=0; barcode<96; barcode++) {
+                if ((summary_track[barcode][7]-summary_track[barcode][5]) > maxsum) maxsum = (summary_track[barcode][7]-summary_track[barcode][5]);
+            }
+            //alert(maxsum)
+            
+            for (var barcode=0; barcode<96; barcode++)
+            {
+                var sum = 0;
+                var inf_indel1 =  Array(6)
+                var out_indel1 = Array(6)
+                var oligo
+                for (let i=0; i <6; i++){
+                    inf_indel1[i] = 0;
+                    out_indel1[i] = 0;
+                }
+                // classify indel into several subset
+                for (let key in aln_dict_fil[barcode]){
+                    if (aln_type_dict[barcode][key] == 2){
+                        for (let i=0; i <6; i++){
+                            if (inf_indel1[i]==0){
+                                inf_indel1[i]=aln_dict_fil[barcode][key];
+                                break;
+                            }
+                        }
+                    } else if (aln_type_dict[barcode][key] == 3){
+                        for (let i=0; i <6; i++){
+                            if (out_indel1[i]==0){
+                                out_indel1[i]=aln_dict_fil[barcode][key];
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                var size = 24*Math.sqrt((summary_track[barcode][7]-summary_track[barcode][5])/maxsum);
+                var midx = (barcode%12)*50 + 25;
+                var midy = Math.floor(barcode/12) * 65 + 25;
+                if ((summary_track[barcode][7]-summary_track[barcode][5]) > 0) {
+                    //wt:
+                    var angle = -3.1415/2;
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*summary_track[barcode][2]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    //SVG:
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(200,200,200)";
+
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // inframe indel1
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*inf_indel1[0]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(50,42,126)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // inframe indel2
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*inf_indel1[1]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(16,115,179)";
+
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // inframe indel3
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*inf_indel1[2]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(38,170,220)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // inframe indel4
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*inf_indel1[3]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(50,42,126)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // inframe indel5
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*inf_indel1[4]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(16,115,179)";
+
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // inframe indel6
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*inf_indel1[5]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(38,170,220)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+                    
+                    // outframe indel1
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_indel1[0]/(summary_track[barcode][7]-summary_track[barcode][5]);
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(232,0,30)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // outframe indel2
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_indel1[1]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(252,176,78)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // outframe indel3
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_indel1[2]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(252,176,78)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // outframe indel4
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_indel1[3]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(232,0,30)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // outframe indel5
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_indel1[4]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(252,176,78)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // outframe indel6
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*out_indel1[5]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(252,176,78)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // targetingOligo
+                    var lastangle = angle;
+                    angle+=2*3.1415*0.995*summary_track[barcode][1]/(summary_track[barcode][7]-summary_track[barcode][5]);
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(0,232,30)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+
+                    // read_ambigous
+                    // var lastangle = angle;
+                    // angle+=2*3.1415*0.995*summary_track[barcode][5]/summary_track[barcode][7];
+
+                    var startx = size*Math.cos(lastangle);
+                    var starty = size*Math.sin(lastangle);
+                    var plusx = size*(Math.cos(angle)-Math.cos(lastangle));
+                    var plusy = size*(Math.sin(angle)-Math.sin(lastangle));
+                    var largearc = 0;
+                    if (angle-lastangle > 3.1415) largearc = 1;
+                    var SVGObj= document.createElementNS(NS,"path");
+                    SVGObj.setAttributeNS(null, "d", "M "+midx+","+midy+" l "+startx+","+starty+" a "+size+" "+size+" 0 "+largearc+" 1 "+plusx+" "+plusy+" z");
+                    SVGObj.style.fill="rgb(70,70,70)";
+                    SVGObj.setAttribute("pointer-events","none");
+                    svg.appendChild(SVGObj);
+                    
+                }
+
+                //SVG:
+                var SVGObj= document.createElementNS(NS,"text");
+                SVGObj.setAttribute("font-family", "sans-serif");
+                SVGObj.setAttribute("font-weight", "100");
+                SVGObj.setAttribute("x", midx);
+                SVGObj.setAttribute("y", midy+36);
+                SVGObj.setAttribute("font-size", "11");
+                SVGObj.setAttribute("text-anchor", "middle");
+                SVGObj.setAttribute("pointer-events","none");
+
+                SVGObj.textContent = GetWellPos(barcode);
+                svg.appendChild(SVGObj);
+            }
+            //legende:
+            var midx = 13*50 + 25;
+            var midy = 0 * 65 + 25;
+            for (var i=0; i<8; i++) {
+                var vol = Math.floor(maxsum/100)*100/Math.pow(2,i);
+                var size = 24*Math.sqrt(vol/maxsum);
+                //SVG:
+                var SVGObj= document.createElementNS(NS,"circle");
+                SVGObj.setAttributeNS(null, "cx", midx);
+                SVGObj.setAttributeNS(null, "cy", midy);
+                SVGObj.setAttributeNS(null, "r" , size);
+                SVGObj.style.fill="none";
+                SVGObj.style.stroke="rgb(100,100,100)";
+                svg.appendChild(SVGObj);
+                var SVGObj= document.createElementNS(NS,"text");
+                SVGObj.setAttribute("font-family", "sans-serif");
+                SVGObj.setAttribute("font-weight", "100");
+                SVGObj.setAttribute("x", midx+40);
+                SVGObj.setAttribute("y", midy+3);
+                SVGObj.setAttribute("font-size", "12");
+                SVGObj.textContent = Math.round(vol) + " reads";
+                svg.appendChild(SVGObj);
+                midy += size*2+10;
+            }
+            for (var i=0; i<11; i++)
+            {
+                var SVGObj= document.createElementNS(NS,"rect");
+                SVGObj.setAttribute("x", midx-6);
+                SVGObj.setAttribute("y", midy+50+20*i);
+                SVGObj.setAttribute("width", "11");
+                SVGObj.setAttribute("height", "11");
+                SVGObj.style.fill="none";
+                if (i<3) SVGObj.style.fill=BLAU[i];
+                if (i>=4 && i<7) SVGObj.style.fill=ROT[i-4];
+                if (i==7) SVGObj.style.fill="rgb(200,200,200)";
+                if (i==8) SVGObj.style.fill="rgb(0,200,0)";
+                if (i==9) SVGObj.style.fill="rgb(70,70,70)";
+                if (i==10){
+                    SVGObj.style.fill="none";
+                    SVGObj.style.stroke="rgb(0,0,0)";
+                    SVGObj.setAttributeNS(null, "stroke-width", 0.5);
+                }
+                svg.appendChild(SVGObj);
+            }
+
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("font-family", "sans-serif");
+            SVGObj.setAttribute("font-weight", "100");
+            SVGObj.setAttribute("x", midx+40);
+            SVGObj.setAttribute("y", midy+80);
+            SVGObj.setAttribute("font-size", "12");
+            SVGObj.textContent = "in-frame indels";
+            svg.appendChild(SVGObj);
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("font-family", "sans-serif");
+            SVGObj.setAttribute("font-weight", "100");
+            SVGObj.setAttribute("x", midx+40);
+            SVGObj.setAttribute("y", midy+80+80);
+            SVGObj.setAttribute("font-size", "12");
+            SVGObj.textContent = "out-of-frame indels";
+            svg.appendChild(SVGObj);
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("font-family", "sans-serif");
+            SVGObj.setAttribute("font-weight", "100");
+            SVGObj.setAttribute("x", midx+40);
+            SVGObj.setAttribute("y", midy+80+120);
+            SVGObj.setAttribute("font-size", "12");
+            SVGObj.textContent = "no indel";
+            svg.appendChild(SVGObj);
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("font-family", "sans-serif");
+            SVGObj.setAttribute("font-weight", "100");
+            SVGObj.setAttribute("x", midx+40);
+            SVGObj.setAttribute("y", midy+80+140);
+            SVGObj.setAttribute("font-size", "12");
+            SVGObj.textContent = "targeted mutagenesis";
+            svg.appendChild(SVGObj);
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("font-family", "sans-serif");
+            SVGObj.setAttribute("font-weight", "100");
+            SVGObj.setAttribute("x", midx+40);
+            SVGObj.setAttribute("y", midy+80+160);
+            SVGObj.setAttribute("font-size", "12");
+            SVGObj.textContent = "ambigous read";
+            svg.appendChild(SVGObj);
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("font-family", "sans-serif");
+            SVGObj.setAttribute("font-weight", "100");
+            SVGObj.setAttribute("x", midx+40);
+            SVGObj.setAttribute("y", midy+80+180);
+            SVGObj.setAttribute("font-size", "12");
+            SVGObj.textContent = "below threshold";
+            svg.appendChild(SVGObj);
+            document.title = "Result for "+document.getElementsByName("GeneName")[0].value+" ("+files.length+" barcodes read)";
+        }
+
+        function PieClick(evt)
+        {
+            var top = document.getElementById("SVGpie").getBoundingClientRect().top;
+            var left = document.getElementById("SVGpie").getBoundingClientRect().left;
+            var x = evt.clientX-left;
+            var y = evt.clientY-top;
+
+            var xx = Math.round((x-25)/50);
+            var yy = Math.round((y-25)/65);
+
+            SelectClone(xx+12*yy);
+        }
+
+        var CurrentAlignment = 0;
+        function SelectClone(barcode)
+        {
+            if (AlignmentPrecalc[barcode]){
+                document.getElementById("DIV_alignment").innerHTML = AlignmentPrecalc[barcode];
+                CurrentAlignment = barcode;
+            } else alert("No data available for the selected barcode.");
+        }
+
+        function GetWellPos(i)
+        {
+            var ABC = "ABCDEFGHIJKL";
+            return ABC[Math.floor(i/12)] + ((i%12)+1);
+        }
+
+        //Alignment summary plot:
+        function PlotAlignment(barcode, locus)
+        {
+            //aggregate aln_track
+            //Find top 3:
+            var aln_type = ["Not align","No indel", "Inframe Indel", "Outframe indel", "", "","", "targetingOligo", "Ambigious"]
+            var ysize = 30;
+            var max=0;
+            var svg = document.getElementById("SVGmut");
+            var NS="http://www.w3.org/2000/svg";
+            var strokew = "0.5";
+            //Clear:
+            while (svg.lastChild){
+                svg.removeChild(svg.lastChild);
+            }
+
+            var delypos=20, delyshift=40;
+
+            //bc, readsum:
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("x", 40);
+            SVGObj.setAttribute("y", ysize+delypos);
+            SVGObj.setAttribute("font-size", "14");
+            SVGObj.textContent = "SUMMARY: Gene: "+document.getElementsByName("GeneName")[0].value+"   |   File "+GetWellPos(barcode)+": "+files[barcode].name;
+            svg.appendChild(SVGObj);
+            delypos+=30;
+
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("x", 40);
+            SVGObj.setAttribute("y", ysize+delypos);
+            SVGObj.setAttribute("font-size", "14");
+            SVGObj.textContent = "Total aligned reads: " + summary_track[barcode][7] +"   |  Total raw reads: " +summary_track[barcode][0];
+            svg.appendChild(SVGObj);
+            delypos+=30;
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("x", 40);
+            SVGObj.setAttribute("y", ysize+delypos);
+            SVGObj.setAttribute("font-size", "14");
+            SVGObj.textContent = "targetingOligo reads: " + summary_track[barcode][1] +"   |  No indel: " +summary_track[barcode][2] +"   | Read ambigous: " +summary_track[barcode][5]+"   | Not aligned: " +summary_track[barcode][6];
+            svg.appendChild(SVGObj);
+
+            delypos+=delyshift;
+
+            var xfrom = BreakPoint-region_analyse*1;
+            var xto = BreakPoint+region_analyse*1;
+            //wt:
+            for (var x=xfrom; x<xto; x++){
+                //draw base:
+                var SVGObj= document.createElementNS(NS,"text");
+                SVGObj.setAttribute("x", 120+12*(x-xfrom)+2);
+                SVGObj.setAttribute("y", ysize+delypos+20);
+                SVGObj.setAttribute("font-size", "14");
+                if (x>=RightBsPos && x<RightBsPos+RightBsLen) SVGObj.setAttribute("fill", "rgb(0,0,250)");
+                else SVGObj.setAttribute("fill", "rgb(0,0,0)");
+                SVGObj.textContent = locus[x];
+                SVGObj.setAttribute("x", 120+12*(x-xfrom));
+                SVGObj.setAttribute("text-anchor", "middle");
+                svg.appendChild(SVGObj);
+            }
+            //reference:
+            var SVGObj= document.createElementNS(NS,"text");
+            SVGObj.setAttribute("x", 10);
+            SVGObj.setAttribute("y", ysize+delypos+20);
+            SVGObj.setAttribute("font-size", "14");
+            SVGObj.textContent += "REFERENCE";
+            svg.appendChild(SVGObj);
+            //line:
+            var SVGObj= document.createElementNS(NS,"path");
+            SVGObj.setAttributeNS(null, "d", "M 10,"+(ysize+delypos+5.5)+" L 1073,"+(ysize+delypos+5.5));
+            SVGObj.style.stroke="rgb(0,0,0)";
+            SVGObj.setAttributeNS(null, "stroke-width", 1);
+            svg.appendChild(SVGObj);
+            delypos+=delyshift;
+            var id1 = 1;
+            for (let key in aln_dict_fil[barcode]){
+                for (var x=0; x<region_analyse*2; x++){
+                    //draw main track:
+                    var SVGObj= document.createElementNS(NS,"text");
+                    SVGObj.setAttribute("x", 120+12*(x)+2);
+                    SVGObj.setAttribute("y", ysize+delypos);
+                    SVGObj.setAttribute("font-size", "14");
+                    SVGObj.setAttribute("fill", "rgb(0,0,0)");
+                    SVGObj.textContent = key[x];
+                    SVGObj.setAttribute("x", 120+12*(x));
+                    SVGObj.setAttribute("text-anchor", "middle");
+                    svg.appendChild(SVGObj);
+                }
+
+                for (var x=0; x<region_analyse*2; x++){
+                    //draw insert:
+                    var SVGObj= document.createElementNS(NS,"text");
+                    SVGObj.setAttribute("x", 120+12*(x)+2);
+                    SVGObj.setAttribute("y", ysize+delypos+20);
+                    SVGObj.setAttribute("font-size", "14");
+                    SVGObj.setAttribute("fill", "rgb(0,0,0)");
+                    SVGObj.textContent = key[x+region_analyse*2];
+                    SVGObj.setAttribute("x", 120+12*(x));
+                    SVGObj.setAttribute("text-anchor", "middle");
+                    svg.appendChild(SVGObj);
+                }
+                
+                var SVGObj= document.createElementNS(NS,"text");
+                SVGObj.setAttribute("x", 10);
+                SVGObj.setAttribute("y", ysize+delypos);
+                SVGObj.setAttribute("font-size", "14");
+                SVGObj.textContent += "GROUP " +id1;
+                svg.appendChild(SVGObj);
+
+                var SVGObj= document.createElementNS(NS,"text");
+                SVGObj.setAttribute("x", 10+ 120+24*(region_analyse)+2 );
+                SVGObj.setAttribute("y", ysize+delypos);
+                SVGObj.setAttribute("font-size", "14");
+                // Count INDEL's length
+                var gap_len1 = (key.substring(region_analyse*2 +1, region_analyse*4).split("G").length-1) +(key.substring(region_analyse*2 +1, region_analyse*4).split("A").length-1) +(key.substring(region_analyse*2 +1, region_analyse*4).split("T").length-1) +(key.substring(region_analyse*2 +1, region_analyse*4).split("C").length-1) - (key.split("-").length-1);
+
+                SVGObj.textContent +="TYPE: "+ aln_type[aln_type_dict[barcode][key]] + ", (" + gap_len1 + " bp)" +" | " +aln_dict_fil[barcode][key] +"  Reads, " + (aln_dict_fil[barcode][key]/(summary_track[barcode][7]-summary_track[barcode][5])*100).toFixed(2) + " %";
+                svg.appendChild(SVGObj);
+                id1+=1;
+                delypos+=delyshift;
+            }
+            AlignmentPrecalc[barcode] = document.getElementById("DIV_alignment").innerHTML;
+        }
+
+        function SaveSVG()
+        {
+            var svg = document.getElementById("DIV_piecharts");
+            //alert(svg.innerHTML);
+            var bb = new Blob([svg.innerHTML], {type: 'text/plain'});
+
+            var a = document.createElement('a');
+            a.download = document.getElementsByName("GeneName")[0].value+".svg";
+            a.href = window.URL.createObjectURL(bb);
+            a.textContent = 'Click here to save';
+            a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
+
+            document.getElementById("save").appendChild(a);
+            a.click();
+        }
+
+        function SaveSVGAlignment()
+        {
+            var svg = document.getElementById("DIV_alignment");
+            //alert(svg.innerHTML);
+            var bb = new Blob([svg.innerHTML], {type: 'text/plain'});
+            var a = document.createElement('a');
+            a.download = document.getElementsByName("GeneName")[0].value+" "+GetWellPos(CurrentAlignment)+".svg";
+            a.href = window.URL.createObjectURL(bb);
+            a.textContent = 'Click here to save';
+            a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
+            document.getElementById("save").appendChild(a);
+            a.click();
+        }
+
+        function PrintSVG()
+        {
+            var printWindow = document.open('', 'Print', 'width=900, height=550');
+            printWindow.document.writeln(document.getElementById("DIV_piecharts").innerHTML);
+            printWindow.document.close();
+            printWindow.print();
+            printWindow.close();
+        }
+
+        function PrintSVGAlignment()
+        {
+            var printWindow = document.open('', 'Print', 'width=1250, height=400');
+            printWindow.document.writeln(document.getElementById("DIV_alignment").innerHTML);
+            printWindow.document.close();
+            printWindow.print();
+            printWindow.close();
+        }
+        // For google site
+        function myFunction1() 
+        {
+            var popup = document.getElementById("help1");
+            popup.classList.toggle("show");
+        }
+        function myFunction2() 
+        {
+            var popup = document.getElementById("help2");
+            popup.classList.toggle("show");
+        }
+        function myFunction3() 
+        {
+            var popup = document.getElementById("help3");
+            popup.classList.toggle("show");
+        }
+        function myFunction4() 
+        {
+            var popup = document.getElementById("help4");
+            popup.classList.toggle("show");
+        }
+        function myFunction6() 
+        {
+            var popup = document.getElementById("help6");
+            popup.classList.toggle("show");
+        }
+        function myFunction7() 
+        {
+            var popup = document.getElementById("help7");
+            popup.classList.toggle("show");
+        }
+        function myFunction8() 
+        {
+            var popup = document.getElementById("help8");
+            popup.classList.toggle("show");
+        }
+        function myFunction9() 
+        {
+            var popup = document.getElementById("help9");
+            popup.classList.toggle("show");
+        }
+        function myFunction5() 
+        {
+            var popup = document.getElementById("help5");
+            popup.classList.toggle("show");
+        }
+    </script>
+</html>
