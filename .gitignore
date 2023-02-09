@@ -112,11 +112,12 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-users_file/
+testdata_script/
 olddata/
 test_data/
-../NGS_webserver/settings.py
-static/
+Data_and_supplementary/
+plot/
+crisprnano_testdata/
 #!static/instruction_duesselpore.md.gitkeep
 !static/manual.pdf.gitkeep
 !static/Rheinturm_preview.png.gitkeep
