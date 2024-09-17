@@ -1,0 +1,39 @@
+This script using GATK variance calling 
+
+gatk HaplotypeCaller \
+-R reference.fasta \
+-I sample.bam \
+-O output.vcf
+
+gatk SelectVariants \
+-R reference.fasta \
+-V output.vcf \
+--select-type-to-include INDEL \
+-O indels.vcf
+
+===================================================================================
+#!/bin/bash
+# Automatic indel detection from BAM
+
+# Input BAM and reference files
+BAM=$1
+REFERENCE=$2
+OUTPUT=$3
+
+# Index BAM if not indexed
+if [ ! -f ${BAM}.bai ]; then
+    samtools index $BAM
+fi
+
+# Call variants (including indels) with bcftools
+bcftools mpileup -f $REFERENCE $BAM | bcftools call -mv -o temp_variants.vcf
+
+# Extract only indels
+bcftools filter -i 'TYPE="indel"' temp_variants.vcf > $OUTPUT
+
+# Clean up temporary files
+rm temp_variants.vcf
+
+echo "Indel detection complete. Results in $OUTPUT"
+
+bash detect_indels.sh sample.bam reference.fasta indels.vcf

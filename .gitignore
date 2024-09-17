@@ -112,7 +112,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-testdata_script/
+#testdata_script/
 olddata/
 test_data/
 Data_and_supplementary/
